@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Koneksi Terputus | Artha</title>
+  
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='33' fill='%23f59e0b'/><circle cx='50' cy='50' r='26' fill='none' stroke='%23fef3c7' stroke-width='3'/><path d='M42 63 L50 35 L58 63 M44 54 L56 54' stroke='%2378350f' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-app: #090d16;
+      --surface-card: #0f172a;
+      --border-card: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --brand-accent: #2563eb;
+      --brand-accent-hover: #1d4ed8;
+      --radius-lg: 16px;
+      --radius-sm: 8px;
+      --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #090d16 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .error-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 1.75rem;
+      text-align: center;
+      box-shadow: var(--shadow-modal);
+    }
+
+    .error-brand-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #ffffff;
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .error-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(234, 179, 8, 0.1);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.25);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .error-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+
+    .error-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1.75rem;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--brand-accent);
+      color: #ffffff;
+      margin-bottom: 0.65rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-card);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .error-footer {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="error-card">
+    <div class="error-brand-logo">
+      <i class="ri-copper-coin-fill"></i>
+    </div>
+    <div class="error-badge">
+      <i class="ri-wifi-off-line"></i> Mode Luar Jaringan (Offline)
+    </div>
+    <h1 class="error-title">Koneksi Internet Terputus</h1>
+    <p class="error-desc">
+      Perangkat Anda sedang tidak terhubung ke jaringan internet atau server sedang dalam pemeliharaan. Silakan periksa koneksi Wi-Fi atau paket data Anda, lalu coba muat ulang.
+    </p>
+
+    <button onclick="window.location.reload()" class="btn-action btn-primary">
+      <i class="ri-refresh-line"></i> Muat Ulang Halaman
+    </button>
+
+    <a href="/" class="btn-action btn-secondary">
+      <i class="ri-home-5-line"></i> Buka Penyimpanan Lokal
+    </a>
+
+    <div class="error-footer">
+      <i class="ri-shield-check-line"></i>
+      <span>Data transaksi Anda tetap tersimpan aman di perangkat</span>
+    </div>
+  </div>
+
+</body>
+</html>

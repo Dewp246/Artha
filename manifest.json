@@ -1,0 +1,17 @@
+{
+  "name": "Artha - Financial Tracker",
+  "short_name": "Artha",
+  "description": "Aplikasi Catatan & Manajemen Keuangan Pribadi Modern",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#06b6d4",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='33' fill='%23f59e0b'/><circle cx='50' cy='50' r='26' fill='none' stroke='%23fef3c7' stroke-width='3'/><path d='M42 63 L50 35 L58 63 M44 54 L56 54' stroke='%2378350f' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

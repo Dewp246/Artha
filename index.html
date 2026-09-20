@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Artha - Financial Tracker</title>
+  
+  <!-- PWA & SEO Meta Tags -->
+  <meta name="description" content="Artha - Aplikasi pencatat pengeluaran dan pemasukan keuangan pribadi dengan tampilan Glassmorphism modern.">
+  <meta name="theme-color" content="#06b6d4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Artha">
+  <meta property="og:title" content="Artha - Financial Tracker">
+  <meta property="og:description" content="Artha - Aplikasi Catatan & Manajemen Keuangan Pribadi Modern">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='33' fill='%23f59e0b'/><circle cx='50' cy='50' r='26' fill='none' stroke='%23fef3c7' stroke-width='3'/><path d='M42 63 L50 35 L58 63 M44 54 L56 54' stroke='%2378350f' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='33' fill='%23f59e0b'/><circle cx='50' cy='50' r='26' fill='none' stroke='%23fef3c7' stroke-width='3'/><path d='M42 63 L50 35 L58 63 M44 54 L56 54' stroke='%2378350f' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+
+  <!-- Google Fonts & Remix Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Chart.js CDN & Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=58">
+</head>
+<body>
+
+  <!-- Auth Landing Screen (Wajib Login) -->
+  <div id="viewAuthScreen" class="auth-screen-wrapper">
+    <div class="auth-screen-card">
+      <div class="auth-brand-logo">
+        <i class="ri-copper-coin-fill"></i>
+      </div>
+      <h1 class="auth-title">Artha</h1>
+      <p class="auth-subtitle">
+        Sistem Manajemen Kas & Finansial Pribadi
+      </p>
+
+      <!-- Auth Tabs: Masuk / Buat Akun -->
+      <div class="auth-tabs">
+        <div class="auth-tab-btn active" id="tabScreenLogin">
+          Masuk
+        </div>
+        <div class="auth-tab-btn" id="tabScreenRegister">
+          Buat Akun Baru
+        </div>
+      </div>
+
+      <!-- Alert Box -->
+      <div id="authScreenAlert" style="display: none; padding: 0.75rem 0.9rem; border-radius: var(--radius-sm); font-size: 0.825rem; margin-bottom: 1rem; text-align: left; line-height: 1.45;"></div>
+
+      <!-- Form Login -->
+      <form id="formScreenLogin" novalidate>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenLoginEmail">Email</label>
+          <input type="email" id="screenLoginEmail" class="glass-input" placeholder="nama@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label for="screenLoginPassword" style="margin-bottom: 0;">Kata Sandi</label>
+            <a href="javascript:void(0)" id="btnOpenForgotPassword" style="font-size: 0.775rem; color: var(--brand-accent); text-decoration: none; font-weight: 500;">Lupa kata sandi?</a>
+          </div>
+          <div class="password-input-wrapper">
+            <input type="password" id="screenLoginPassword" class="glass-input" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="password-toggle-btn" id="btnToggleLoginPass" title="Tampilkan/Sembunyikan Kata Sandi">
+              <i class="ri-eye-line" id="iconToggleLoginPass"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitScreenLogin" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-login-circle-line"></i> Masuk ke Akun
+        </button>
+      </form>
+
+      <!-- Form Register -->
+      <form id="formScreenRegister" style="display: none;" novalidate>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenRegisterEmail">Email</label>
+          <input type="email" id="screenRegisterEmail" class="glass-input" placeholder="nama@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenRegisterPassword">Kata Sandi</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="screenRegisterPassword" class="glass-input" placeholder="Minimal 6 karakter" minlength="6" autocomplete="new-password" required>
+            <button type="button" class="password-toggle-btn" id="btnToggleRegisterPass" title="Tampilkan/Sembunyikan Kata Sandi">
+              <i class="ri-eye-line" id="iconToggleRegisterPass"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitScreenRegister" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-user-add-line"></i> Daftarkan Akun
+        </button>
+      </form>
+
+      <!-- Form Forgot Password (Pemulihan Kata Sandi) -->
+      <form id="formScreenForgotPassword" style="display: none;" novalidate>
+        <div style="text-align: left; margin-bottom: 1rem;">
+          <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.25rem;">Pemulihan Kata Sandi</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Masukkan email terdaftar Anda untuk menerima tautan atur ulang kata sandi.</div>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenForgotEmail">Email Terdaftar</label>
+          <input type="email" id="screenForgotEmail" class="glass-input" placeholder="nama@email.com" autocomplete="email" required>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitForgotPassword" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-mail-send-line"></i> Kirim Tautan Pemulihan
+        </button>
+        <button type="button" class="glass-button secondary" id="btnBackToLoginFromForgot" style="width: 100%; margin-top: 0.5rem; font-size: 0.825rem;">
+          <i class="ri-arrow-left-line"></i> Kembali ke Halaman Masuk
+        </button>
+      </form>
+
+      <!-- Form Reset Password (Tampil saat user klik link dari email) -->
+      <form id="formScreenResetPassword" style="display: none;" novalidate>
+        <div style="text-align: left; margin-bottom: 1rem;">
+          <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 0.25rem;">Buat Kata Sandi Baru</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Silakan masukkan kata sandi baru untuk akun Artha Anda.</div>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenNewPassword">Kata Sandi Baru</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="screenNewPassword" class="glass-input" placeholder="Minimal 6 karakter" minlength="6" autocomplete="new-password" required>
+            <button type="button" class="password-toggle-btn" id="btnToggleNewPass" title="Tampilkan/Sembunyikan Kata Sandi">
+              <i class="ri-eye-line" id="iconToggleNewPass"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label for="screenConfirmNewPassword">Konfirmasi Kata Sandi Baru</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="screenConfirmNewPassword" class="glass-input" placeholder="Ulangi kata sandi baru" minlength="6" autocomplete="new-password" required>
+            <button type="button" class="password-toggle-btn" id="btnToggleConfirmPass" title="Tampilkan/Sembunyikan Kata Sandi">
+              <i class="ri-eye-line" id="iconToggleConfirmPass"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitResetPassword" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-check-line"></i> Simpan Kata Sandi Baru
+        </button>
+      </form>
+
+      <div class="auth-security-badge">
+        <i class="ri-shield-check-line" style="color: var(--income-green); font-size: 0.95rem;"></i>
+        <span>Enkripsi akun terproteksi Supabase Auth & RLS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App Wrapper (Tampil hanya saat sudah login) -->
+  <div id="appContainer" style="display: none;">
+
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="app-sidebar">
+      <div class="brand-header">
+        <div class="brand-logo-wrapper">
+          <div class="brand-icon">
+            <i class="ri-copper-coin-fill"></i>
+          </div>
+          <div class="brand-info">
+            <span class="brand-title">Artha</span>
+            <span class="brand-subtitle">Financial Tracker</span>
+          </div>
+        </div>
+        <button id="btnToggleSidebarDesktop" class="sidebar-toggle-btn" title="Kecilkan / Besarkan Sidebar">
+          <i class="ri-side-bar-line"></i>
+        </button>
+      </div>
+
+    <nav>
+      <ul class="nav-list">
+        <li>
+          <a href="#dashboard" class="nav-item active" data-page="dashboard">
+            <i class="ri-dashboard-3-line"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="#transactions" class="nav-item" data-page="transactions">
+            <i class="ri-exchange-dollar-line"></i>
+            <span>Transaksi</span>
+          </a>
+        </li>
+        <li>
+          <a href="#savings" class="nav-item" data-page="savings">
+            <i class="ri-copper-coin-line"></i>
+            <span>Celengan Impian</span>
+          </a>
+        </li>
+        <li>
+          <a href="#debts" class="nav-item" data-page="debts">
+            <i class="ri-hand-coin-line"></i>
+            <span>Hutang & Piutang</span>
+          </a>
+        </li>
+        <li>
+          <a href="#budget" class="nav-item" data-page="budget">
+            <i class="ri-pie-chart-2-line"></i>
+            <span>Anggaran & Kategori</span>
+          </a>
+        </li>
+        <li>
+          <a href="#settings" class="nav-item" data-page="settings">
+            <i class="ri-settings-4-line"></i>
+            <span>Pengaturan & Backup</span>
+          </a>
+        </li>
+        <li>
+          <a href="#admin" class="nav-item" data-page="admin" id="navItemAdmin" style="display: none;">
+            <i class="ri-shield-user-line"></i>
+            <span>Admin Panel</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="pwa-install-banner" id="pwaBanner" style="display: none;">
+        <i class="ri-smartphone-line" style="font-size: 1.25rem; color: var(--brand-accent);"></i>
+        <p>Akses Artha lebih cepat dengan aplikasi PWA.</p>
+        <button class="glass-button secondary" id="btnInstallPwa" style="padding: 0.35rem 0.75rem; font-size: 0.775rem; width: 100%;">
+          Install Aplikasi
+        </button>
+      </div>
+
+      <!-- User Account Widget in Sidebar Footer -->
+      <div id="authHeaderContainer" class="sidebar-user-card">
+        <button class="glass-button secondary" id="btnOpenAuthModal" style="padding: 0.45rem 0.8rem; font-size: 0.8rem; width: 100%;">
+          <i class="ri-user-3-line"></i>
+          <span>Masuk / Daftar</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Content -->
+  <main class="app-main">
+    
+    <!-- Global System Broadcast Banner (Admin Announcement) -->
+    <div id="globalBroadcastBanner" class="global-broadcast-banner" style="display: none;">
+      <div class="broadcast-inner">
+        <div class="broadcast-icon-wrap">
+          <i class="ri-megaphone-line"></i>
+        </div>
+        <div class="broadcast-text" id="broadcastMessageText">
+          Pemberitahuan Sistem
+        </div>
+        <button type="button" class="broadcast-close-btn" id="btnCloseBroadcastBanner" title="Tutup Pemberitahuan">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Top Header Bar -->
+    <header class="top-bar">
+      <div class="greeting-text">
+        <h1 id="welcomeTitle">Ringkasan Keuangan</h1>
+        <div class="greeting-meta">
+          <span class="date-chip">
+            <i class="ri-calendar-event-line"></i>
+            <span id="currentDateDisplay">Senin, 3 Agu 2026</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="top-bar-actions">
+        <button class="theme-toggle-btn" id="btnToggleTheme" title="Ganti Tema (Light / Dark)">
+          <i class="ri-sun-line icon-sun" style="display: none;"></i>
+          <i class="ri-moon-line icon-moon"></i>
+          <span id="themeToggleText">Light Mode</span>
+        </button>
+
+        <button class="glass-button secondary" id="btnPrintReport" onclick="openPrintReportModal('CURRENT_MONTH')" title="Cetak Laporan Keuangan Bulanan (PDF)">
+          <i class="ri-printer-line"></i>
+          <span class="btn-text-responsive">Cetak Laporan</span>
+        </button>
+
+        <button class="glass-button primary-cta" id="btnOpenAddTxModal">
+          <i class="ri-add-line"></i>
+          <span>Tambah Transaksi</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: DASHBOARD VIEW -->
+    <div id="viewDashboard" class="page-view active">
+      
+      <!-- Overspending Alert Banner (Automatic Threshold Monitor) -->
+      <div id="overspendingAlertBanner" class="overspending-banner-container" style="display: none;"></div>
+
+      <!-- Financial Health Score & 50/30/20 Smart Insights -->
+      <section class="glass-card financial-health-card" id="financialHealthSection" style="margin-bottom: 1.5rem;">
+        <div class="financial-health-header">
+          <div class="health-header-left">
+            <div class="health-icon-pulse">
+              <i class="ri-heart-pulse-line"></i>
+            </div>
+            <div>
+              <div class="chart-title">Financial Health Score & Analisis 50/30/20</div>
+              <div class="chart-subtitle">Evaluasi rasio tabungan, kestabilan kas, dan rekomendasi cerdas</div>
+            </div>
+          </div>
+          <div class="health-score-badge" id="healthScoreBadge">
+            <span class="health-score-val" id="valHealthScore">--</span>
+            <span class="health-score-label" id="lblHealthStatus">Mengalkulasi...</span>
+          </div>
+        </div>
+
+        <div class="health-body-grid">
+          <!-- 50/30/20 Rule Progress Bars -->
+          <div class="health-allocations">
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-home-4-line"></i> Kebutuhan Pokok (Target &le; 50%)</span>
+                <strong id="valNeedsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill needs" id="barNeedsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-gamepad-line"></i> Keinginan & Gaya Hidup (Target &le; 30%)</span>
+                <strong id="valWantsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill wants" id="barWantsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-copper-coin-line"></i> Tabungan & Investasi (Target &ge; 20%)</span>
+                <strong id="valSavingsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill savings" id="barSavingsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smart Recommendation Tips Box -->
+          <div class="health-smart-tip-box" id="healthSmartTipBox">
+            <div class="smart-tip-title">
+              <i class="ri-lightbulb-line" style="color: var(--warning-amber);"></i>
+              <span>Insight Keuangan Cerdas</span>
+            </div>
+            <div class="smart-tip-text" id="healthSmartTipText">
+              Catat pengeluaran Anda bulan ini untuk membuka rekomendasi finansial berbasis data.
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Metrics Summary Cards -->
+      <section class="metrics-grid">
+        <div class="glass-card metric-card glow">
+          <div class="metric-header">
+            <span class="metric-title">Total Saldo Kas</span>
+            <div class="metric-icon">
+              <i class="ri-bank-card-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="valNetBalance">Rp 0</div>
+          <div class="metric-subtitle" id="subNetBalance">Saldo aktif saat ini</div>
+        </div>
+
+        <div class="glass-card metric-card mom">
+          <div class="metric-header">
+            <span class="metric-title">Uang di Orang Tua</span>
+            <button class="metric-action-btn" id="btnOpenMomModal" title="Kelola Titipan Uang di Orang Tua">
+              <i class="ri-equalizer-line"></i>
+              <span>Kelola</span>
+            </button>
+          </div>
+          <div class="metric-value tabular-nums" id="valMomBalance" style="color: var(--mom-pink);">Rp 0</div>
+          <div class="metric-subtitle">Simpanan pegangan keluarga</div>
+        </div>
+
+        <div class="glass-card metric-card income">
+          <div class="metric-header">
+            <span class="metric-title">Pemasukan</span>
+            <div class="metric-icon">
+              <i class="ri-arrow-down-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="valTotalIncome" style="color: var(--income-green);">Rp 0</div>
+          <div class="metric-subtitle" id="subTotalIncome">Periode bulan ini</div>
+        </div>
+
+        <div class="glass-card metric-card expense">
+          <div class="metric-header">
+            <span class="metric-title">Pengeluaran</span>
+            <div class="metric-icon">
+              <i class="ri-arrow-up-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="valTotalExpense" style="color: var(--expense-red);">Rp 0</div>
+          <div class="metric-subtitle" id="subTotalExpense">Periode bulan ini</div>
+        </div>
+
+        <div class="glass-card metric-card savings">
+          <div class="metric-header">
+            <span class="metric-title">Arus Kas Bersih</span>
+            <div class="metric-icon">
+              <i class="ri-scales-3-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="valNetSavings" style="color: var(--savings-indigo);">Rp 0</div>
+          <div class="metric-subtitle" id="subNetSavings">Surplus / defisit operasional</div>
+        </div>
+      </section>
+
+      <!-- Charts & Visual Analytics Section -->
+      <section class="charts-grid">
+        <div class="glass-card chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Arus Kas Bulanan (Cash Flow)</div>
+            <select class="custom-select" id="selectChartYear">
+              <option value="2026">Tahun 2026</option>
+              <option value="2025">Tahun 2025</option>
+            </select>
+          </div>
+          <div class="chart-container">
+            <canvas id="cashFlowChart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Kategori Pengeluaran</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="expenseDonutChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+       <!-- Recent Transactions Section on Dashboard -->
+       <section class="glass-card" style="margin-bottom: 2rem;">
+         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+           <div class="chart-title" style="font-size: 1.15rem;">
+             <i class="ri-history-line" style="color: var(--primary-teal); margin-right: 0.4rem;"></i> Transaksi Terbaru
+           </div>
+           <button class="glass-button secondary" id="btnSeeAllTxDashboard" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+             Lihat Semua <i class="ri-arrow-right-line"></i>
+           </button>
+         </div>
+         <div id="dashboardRecentTxList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+           <!-- Dynamic Recent Tx populated via JS -->
+         </div>
+       </section>
+
+      <!-- Budget Limits & Category Breakdown Section -->
+      <section class="section-grid">
+        <div class="glass-card budget-card">
+          <div class="budget-header">
+            <div>
+              <div class="chart-title">Batas Anggaran Bulanan</div>
+              <div class="chart-subtitle">Target belanja & realisasi per kategori</div>
+            </div>
+            <button class="glass-button secondary" id="btnOpenBudgetModal" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              <i class="ri-edit-line"></i> Atur Anggaran
+            </button>
+          </div>
+          <div class="budget-list" id="budgetProgressContainer">
+            <!-- Dynamic Budget Progress Bars populated via JS -->
+          </div>
+        </div>
+
+        <!-- Payment Channels Breakdown Section -->
+        <div class="glass-card budget-card" style="display: flex; flex-direction: column;">
+          <div class="budget-header">
+            <div>
+              <div class="chart-title">Distribusi Kanal Pembayaran</div>
+              <div class="chart-subtitle">Realisasi pengeluaran per metode pembayaran</div>
+            </div>
+          </div>
+          <div id="paymentChannelBreakdown" style="display: flex; flex-direction: column;">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- VIEW 2: TRANSACTIONS MANAGEMENT VIEW -->
+    <div id="viewTransactions" class="page-view" style="display: none;">
+      
+      <section class="glass-card transactions-card">
+        <div class="transactions-toolbar">
+          <!-- Top Row: Search Box & Actions -->
+          <div style="display: flex; gap: 0.75rem; width: 100%; flex-wrap: wrap; align-items: center;">
+            <div class="search-box-large" style="flex: 1; min-width: 260px;">
+              <i class="ri-search-line"></i>
+              <input type="text" class="glass-input" id="searchTxInput" placeholder="Cari transaksi berdasarkan catatan, kategori, atau metode (Ctrl+K)...">
+              <span class="search-shortcut-hint">/</span>
+            </div>
+            <button class="glass-button secondary" id="btnPrintFilteredTx" onclick="openPrintReportModal('FILTERED')" title="Cetak Riwayat Transaksi Saat Ini">
+              <i class="ri-printer-line"></i>
+              <span>Cetak Hasil</span>
+            </button>
+            <button class="glass-button secondary" id="btnResetTxFilter" title="Reset Semua Filter" style="display: none;">
+              <i class="ri-filter-off-line"></i>
+              <span>Reset Filter</span>
+            </button>
+          </div>
+          
+          <!-- Filter Controls Row -->
+          <div class="filter-controls-row" style="margin-top: 0.75rem; width: 100%; display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center;">
+            <div class="segmented-control" id="txTypeFilterSegmented">
+              <button type="button" class="seg-btn active" data-type="ALL">Semua</button>
+              <button type="button" class="seg-btn" data-type="EXPENSE">Pengeluaran</button>
+              <button type="button" class="seg-btn" data-type="INCOME">Pemasukan</button>
+            </div>
+
+            <select class="custom-select" id="filterTypeSelect" style="display: none;">
+              <option value="ALL">Semua Jenis</option>
+              <option value="EXPENSE">Pengeluaran</option>
+              <option value="INCOME">Pemasukan</option>
+            </select>
+
+            <select class="custom-select" id="filterCategorySelect" style="min-width: 170px;">
+              <option value="ALL">Semua Kategori</option>
+            </select>
+
+            <select class="custom-select" id="filterPaymentSelect" style="min-width: 170px;">
+              <option value="ALL">Semua Metode Bayar</option>
+              <option value="Tunai / Cash">Tunai / Cash</option>
+              <option value="Uang di Orang Tua">Uang di Orang Tua</option>
+              <option value="Bank BCA">Bank BCA</option>
+              <option value="Bank Mandiri">Bank Mandiri</option>
+              <option value="GoPay">GoPay</option>
+              <option value="OVO">OVO</option>
+              <option value="ShopeePay">ShopeePay</option>
+            </select>
+
+            <!-- Quick Date Preset Chips -->
+            <div class="date-preset-chips" id="datePresetChips">
+              <button type="button" class="preset-chip active" data-preset="ALL">Semua</button>
+              <button type="button" class="preset-chip" data-preset="THIS_MONTH">Bulan Ini</button>
+              <button type="button" class="preset-chip" data-preset="LAST_30">30 Hari</button>
+              <button type="button" class="preset-chip" data-preset="CUSTOM">Rentang Tanggal</button>
+            </div>
+          </div>
+
+          <!-- Custom Date Range Row (Collapsible) -->
+          <div id="customDateRangeRow" style="display: none; margin-top: 0.75rem; width: 100%; align-items: center; gap: 0.65rem; flex-wrap: wrap; padding: 0.65rem 0.85rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.825rem; color: var(--text-secondary);">
+              <i class="ri-calendar-line" style="color: var(--brand-accent);"></i>
+              <span>Dari:</span>
+              <input type="date" id="txFilterDateStart" class="glass-input" style="padding: 0.35rem 0.6rem; font-size: 0.825rem;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.825rem; color: var(--text-secondary);">
+              <span>Sampai:</span>
+              <input type="date" id="txFilterDateEnd" class="glass-input" style="padding: 0.35rem 0.6rem; font-size: 0.825rem;">
+            </div>
+            <button type="button" class="glass-button secondary" id="btnApplyDateFilter" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              Terapkan
+            </button>
+          </div>
+        </div>
+
+        <div class="tx-table-meta-bar">
+          <span id="txCountBadge" class="tx-counter-text">Menampilkan semua transaksi</span>
+          <div id="txSummaryPills" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge income" id="badgeTxSumIncome" style="display: none;">Masuk: Rp 0</span>
+            <span class="badge expense" id="badgeTxSumExpense" style="display: none;">Keluar: Rp 0</span>
+          </div>
+        </div>
+
+        <div class="tx-table-container">
+          <table class="tx-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Kategori</th>
+                <th>Metode</th>
+                <th>Catatan</th>
+                <th>Jumlah</th>
+                <th style="text-align: right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody">
+              <!-- Dynamic Rows populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- VIEW 4: CELENGAN IMPIAN & WISHLIST TABUNGAN -->
+    <div id="viewSavings" class="page-view" style="display: none;">
+      
+      <section class="glass-card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="ri-copper-coin-fill" style="color: var(--brand-accent);"></i> Celengan Impian & Wishlist
+            </h2>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+              Alokasikan dan pantau perkembangan tabungan untuk impian, kebutuhan masa depan, dan dana darurat.
+            </p>
+          </div>
+          <button class="glass-button primary-cta" id="btnOpenAddSavingsGoalModal">
+            <i class="ri-add-line"></i> Buat Target Impian
+          </button>
+        </div>
+
+        <!-- Savings Metrics Summary -->
+        <div class="metrics-grid" style="margin-top: 1.25rem;">
+          <div class="glass-card metric-card" style="border: 1px solid var(--income-green-border); background: var(--income-green-bg);">
+            <div class="metric-header">
+              <span class="metric-title">Total Tabungan Terkumpul</span>
+              <div class="metric-icon" style="color: var(--income-green);">
+                <i class="ri-wallet-3-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valSavingsTotalAccumulated" style="color: var(--income-green);">Rp 0</div>
+            <div class="metric-subtitle">Dari seluruh celengan aktif</div>
+          </div>
+
+          <div class="glass-card metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Total Target Impian</span>
+              <div class="metric-icon" style="color: var(--brand-accent);">
+                <i class="ri-flag-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valSavingsTotalTarget">Rp 0</div>
+            <div class="metric-subtitle">Kebutuhan dana keseluruhan</div>
+          </div>
+
+          <div class="glass-card metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Persentase Capaian</span>
+              <div class="metric-icon" style="color: var(--savings-indigo);">
+                <i class="ri-percent-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valSavingsOverallPercent" style="color: var(--savings-indigo);">0%</div>
+            <div class="metric-subtitle">Rata-rata progres target</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Savings Filter Segmented & List Grid -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div class="segmented-control" id="savingsFilterSegmented">
+          <button type="button" class="seg-btn active" data-filter="ALL">Semua Target</button>
+          <button type="button" class="seg-btn" data-filter="IN_PROGRESS">Dalam Proses</button>
+          <button type="button" class="seg-btn" data-filter="ACHIEVED">Tercapai</button>
+        </div>
+        <span class="badge neutral" id="badgeSavingsGoalsCount">0 Impian Terdaftar</span>
+      </div>
+
+      <div id="savingsGoalsListContainer" class="savings-goals-grid">
+        <!-- Dynamic savings goal cards populated via JS -->
+      </div>
+
+    </div>
+
+    <!-- VIEW 5: PENCATATAN HUTANG & PIUTANG -->
+    <div id="viewDebts" class="page-view" style="display: none;">
+      
+      <section class="glass-card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="ri-hand-coin-line" style="color: var(--warning-amber);"></i> Catatan Hutang & Piutang
+            </h2>
+            <p style="font-size: 0.825rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+              Lacak kewajiban pembayaran hutang Anda dan tagihan piutang pihak lain secara terstruktur.
+            </p>
+          </div>
+          <button class="glass-button primary-cta" id="btnOpenAddDebtModal">
+            <i class="ri-add-line"></i> Catat Hutang / Piutang
+          </button>
+        </div>
+
+        <!-- Debts Metrics Summary Grid -->
+        <div class="metrics-grid" style="margin-top: 1.25rem;">
+          <div class="glass-card metric-card" style="border: 1px solid var(--expense-red-border); background: var(--expense-red-bg);">
+            <div class="metric-header">
+              <span class="metric-title">Hutang Saya (Wajib Dibayar)</span>
+              <div class="metric-icon" style="color: var(--expense-red);">
+                <i class="ri-arrow-up-circle-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valTotalDebtsOwed" style="color: var(--expense-red);">Rp 0</div>
+            <div class="metric-subtitle" id="subTotalDebtsOwed">0 catatan belum lunas</div>
+          </div>
+
+          <div class="glass-card metric-card" style="border: 1px solid var(--income-green-border); background: var(--income-green-bg);">
+            <div class="metric-header">
+              <span class="metric-title">Piutang Saya (Harus Ditagih)</span>
+              <div class="metric-icon" style="color: var(--income-green);">
+                <i class="ri-arrow-down-circle-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valTotalLoansReceivable" style="color: var(--income-green);">Rp 0</div>
+            <div class="metric-subtitle" id="subTotalLoansReceivable">0 catatan belum lunas</div>
+          </div>
+
+          <div class="glass-card metric-card">
+            <div class="metric-header">
+              <span class="metric-title">Saldo Bersih Piutang - Hutang</span>
+              <div class="metric-icon" style="color: var(--brand-accent);">
+                <i class="ri-scales-line"></i>
+              </div>
+            </div>
+            <div class="metric-value tabular-nums" id="valNetDebtBalance">Rp 0</div>
+            <div class="metric-subtitle">Kewajiban bersih</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Debts Filter Segmented & List Grid -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div class="segmented-control" id="debtTypeFilterSegmented">
+          <button type="button" class="seg-btn active" data-filter="ALL">Semua Catatan</button>
+          <button type="button" class="seg-btn" data-filter="DEBT">Hutang Saya</button>
+          <button type="button" class="seg-btn" data-filter="LOAN">Piutang Saya</button>
+          <button type="button" class="seg-btn" data-filter="UNPAID">Belum Lunas</button>
+          <button type="button" class="seg-btn" data-filter="PAID">Sudah Lunas</button>
+        </div>
+        <span class="badge neutral" id="badgeDebtsCount">0 Catatan Terdata</span>
+      </div>
+
+      <div id="debtsListContainer" class="debts-grid">
+        <!-- Dynamic debt cards populated via JS -->
+      </div>
+
+    </div>
+
+    <!-- VIEW 3: ADMIN CONTROL PANEL (Hanya Akun Admin) -->
+    <div id="viewAdmin" class="page-view" style="display: none;">
+      
+      <!-- Admin Top Metrics Grid -->
+      <section class="metrics-grid" style="margin-bottom: 1.5rem;">
+        <div class="glass-card metric-card" id="cardAdminOnlineUsers" style="cursor: pointer;" title="Klik untuk lihat Pengguna Terdaftar">
+          <div class="metric-header">
+            <span class="metric-title">Pengguna Online</span>
+            <div class="metric-icon" style="color: var(--income-green); background: var(--income-green-bg);">
+              <i class="ri-user-shared-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="adminOnlineUsers">1 Online</div>
+          <div class="metric-subtitle">Sesi Aktif Real-time</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Total Transaksi Global</span>
+            <div class="metric-icon" style="color: var(--income-green); background: var(--income-green-bg);">
+              <i class="ri-exchange-dollar-line"></i>
+            </div>
+          </div>
+          <div class="metric-value tabular-nums" id="adminTotalTx">0</div>
+          <div class="metric-subtitle">Tercatat di Tabel Database</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Layanan Database</span>
+            <div class="metric-icon" style="color: var(--savings-indigo); background: var(--savings-indigo-bg);">
+              <i class="ri-database-2-line"></i>
+            </div>
+          </div>
+          <div class="metric-value" id="adminDbStatus" style="font-size: 1.15rem; color: var(--income-green);">Online</div>
+          <div class="metric-subtitle" id="adminDbLatency">Latensi: Mengukur...</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Status SMTP Email</span>
+            <div class="metric-icon" style="color: var(--warning-amber); background: var(--warning-amber-bg);">
+              <i class="ri-mail-check-line"></i>
+            </div>
+          </div>
+          <div class="metric-value" style="font-size: 1.15rem; color: var(--income-green);">Aktif (Gmail)</div>
+          <div class="metric-subtitle">Port 465 • SSL Terenkripsi</div>
+        </div>
+      </section>
+
+      <!-- Admin Sub-Navigation Tabs -->
+      <div class="admin-tab-bar">
+        <button type="button" class="admin-tab-btn active" id="tabAdminOverview" data-tab="overview">
+          <i class="ri-server-line"></i>
+          <span>Status & Layanan</span>
+        </button>
+        <button type="button" class="admin-tab-btn" id="tabAdminUsers" data-tab="users">
+          <i class="ri-group-line"></i>
+          <span>Pengguna Terdaftar</span>
+          <span class="badge neutral" id="badgeTotalUsersCount" style="margin-left: 0.35rem; font-size: 0.725rem;">1</span>
+        </button>
+      </div>
+
+      <!-- TAB PANEL 1: STATUS & LAYANAN (OVERVIEW) -->
+      <div id="panelAdminOverview" class="admin-tab-panel">
+        <!-- Admin Control & Health Overview -->
+        <section class="section-grid" style="margin-bottom: 1.5rem;">
+          <div class="glass-card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div class="chart-title">Status Infrastruktur & Layanan</div>
+                <div class="chart-subtitle">Pemantauan kesehatan server secara langsung</div>
+              </div>
+              <button class="glass-button secondary" id="btnTestDbLatency" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                <i class="ri-pulse-line"></i> Tes Latensi
+              </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="ri-cloud-line" style="color: var(--brand-accent); font-size: 1.15rem;"></i>
+                  <div>
+                    <div style="font-weight: 600; font-size: 0.875rem;">Supabase Cloud (PostgreSQL)</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Region: Singapore (ap-southeast-1)</div>
+                  </div>
+                </div>
+                <span class="badge income" id="badgeAdminDbHealth">Online & Stabil</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="ri-mail-send-line" style="color: var(--warning-amber); font-size: 1.15rem;"></i>
+                  <div>
+                    <div style="font-weight: 600; font-size: 0.875rem;">Gmail SMTP Gateway</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Host: smtp.gmail.com • Auth: App Passwords</div>
+                  </div>
+                </div>
+                <span class="badge income">Terkonfigurasi</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="ri-global-line" style="color: var(--primary-teal); font-size: 1.15rem;"></i>
+                  <div>
+                    <div style="font-weight: 600; font-size: 0.875rem;">Domain Produksi & SSL</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">https://www.artha.my.id (Vercel Edge Network)</div>
+                  </div>
+                </div>
+                <span class="badge income">HTTPS Aktif</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="ri-apps-line" style="color: var(--savings-indigo); font-size: 1.15rem;"></i>
+                  <div>
+                    <div style="font-weight: 600; font-size: 0.875rem;">PWA Cache & Service Worker</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Versi Cache: artha-v48 • Dukungan Offline Aktif</div>
+                  </div>
+                </div>
+                <span class="badge income">Sinkron</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Quick Actions & Testing -->
+          <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="chart-title">Operasional & Pengujian Admin</div>
+              <div class="chart-subtitle" style="margin-bottom: 1.25rem;">Aksi cepat pemeliharaan dan pengujian sistem</div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="padding: 0.9rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                  <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">Uji Coba Pengiriman Email SMTP</div>
+                  <div style="font-size: 0.775rem; color: var(--text-muted); margin-bottom: 0.75rem;">Kirimkan email pemulihan uji coba ke email admin untuk memverifikasi performa server Google.</div>
+                  <button class="glass-button secondary" id="btnAdminTestEmail" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; width: 100%;">
+                    <i class="ri-send-plane-line"></i> Kirim Email Uji Coba ke Admin
+                  </button>
+                </div>
+
+                <div style="padding: 0.9rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+                  <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">Ekspor Cadangan Master Database</div>
+                  <div style="font-size: 0.775rem; color: var(--text-muted); margin-bottom: 0.75rem;">Unduh seluruh data transaksi dan saldo dalam format JSON terenkripsi.</div>
+                  <button class="glass-button secondary" id="btnAdminExportMaster" style="font-size: 0.8rem; padding: 0.4rem 0.85rem; width: 100%;">
+                    <i class="ri-download-cloud-line"></i> Unduh Master Backup JSON
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Broadcast Announcement Manager Card for Admin -->
+            <div style="margin-top: 1.25rem; padding: 1.15rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+                <i class="ri-broadcast-line" style="color: var(--brand-accent); font-size: 1.15rem;"></i>
+                <div style="font-weight: 700; font-size: 0.9rem;">Siaran Pengumuman Global (Broadcast)</div>
+              </div>
+              <div style="font-size: 0.775rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                Kirimkan pengumuman penting atau jadwal pemeliharaan kepada seluruh pengguna aplikasi secara langsung.
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <textarea id="adminBroadcastInput" class="glass-input" rows="2" placeholder="Tuliskan isi pengumuman sistem di sini..."></textarea>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                  <label style="display: flex; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.825rem; user-select: none;">
+                    <input type="checkbox" id="adminBroadcastActive" style="width: 1.05rem; height: 1.05rem; accent-color: var(--brand-accent);">
+                    <span>Aktifkan pengumuman</span>
+                  </label>
+
+                  <button type="button" class="glass-button primary-cta" id="btnSaveAdminBroadcast" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
+                    <i class="ri-send-plane-fill"></i> Simpan & Siarkan
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="adminActionAlert" style="display: none; padding: 0.65rem 0.85rem; border-radius: var(--radius-xs); font-size: 0.8rem; margin-top: 1rem;"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB PANEL 2: PENGGUNA TERDAFTAR (LIST) -->
+      <div id="panelAdminUsers" class="admin-tab-panel" style="display: none;">
+        <section class="glass-card" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <div class="chart-title">Pengguna Terdaftar</div>
+              <div class="chart-subtitle">Daftar akun yang terdata dan memiliki akses dalam ekosistem Artha</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="glass-button secondary" id="btnCopyAdminRpcSql" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;" title="Salin SQL untuk sinkronisasi otomatis seluruh akun Supabase">
+                <i class="ri-database-2-line"></i> Script SQL Supabase
+              </button>
+              <button class="glass-button secondary" id="btnRefreshAdminUsers" style="font-size: 0.8rem; padding: 0.4rem 0.85rem;">
+                <i class="ri-refresh-line"></i> Segarkan Daftar
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic List of Registered Users -->
+          <div id="adminUsersListContainer" class="admin-user-list">
+            <!-- Dynamically populated via JS as rich list items -->
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Floating Action Button (FAB) -->
+  <button class="fab-button" id="fabAddTx">
+    <i class="ri-add-line"></i>
+  </button>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <a href="#dashboard" class="bottom-nav-item active" data-page="dashboard">
+      <i class="ri-dashboard-3-line"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="#transactions" class="bottom-nav-item" data-page="transactions">
+      <i class="ri-exchange-dollar-line"></i>
+      <span>Transaksi</span>
+    </a>
+    <a href="#savings" class="bottom-nav-item" data-page="savings">
+      <i class="ri-copper-coin-line"></i>
+      <span>Celengan</span>
+    </a>
+    <a href="#debts" class="bottom-nav-item" data-page="debts">
+      <i class="ri-hand-coin-line"></i>
+      <span>Hutang</span>
+    </a>
+    <a href="#settings" class="bottom-nav-item" data-page="settings">
+      <i class="ri-settings-4-line"></i>
+      <span>Setting</span>
+    </a>
+    <a href="#admin" class="bottom-nav-item" data-page="admin" id="bottomNavAdmin" style="display: none;">
+      <i class="ri-shield-user-line"></i>
+      <span>Admin</span>
+    </a>
+  </nav>
+
+  <!-- Modal: Add / Edit Transaction -->
+  <div class="modal-overlay" id="modalTransaction">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalTxTitle">Tambah Transaksi Baru</h2>
+        <button class="modal-close" id="btnCloseTxModal">&times;</button>
+      </div>
+
+      <form id="formTransaction">
+        <input type="hidden" id="txId">
+
+        <div class="form-group">
+          <label>Jenis Transaksi</label>
+          <div class="type-toggle">
+            <div class="toggle-option active expense" id="btnToggleExpense">Pengeluaran</div>
+            <div class="toggle-option income" id="btnToggleIncome">Pemasukan</div>
+          </div>
+          <input type="hidden" id="txType" value="EXPENSE">
+        </div>
+
+        <div class="form-group">
+          <label for="txAmount">Jumlah (Rp)</label>
+          <input type="number" id="txAmount" class="glass-input" placeholder="Contoh: 50000" required min="1">
+        </div>
+
+        <div class="form-group">
+          <label for="txCategory">Kategori</label>
+          <select id="txCategory" class="custom-select" style="width: 100%;" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="txPayment">Metode Pembayaran</label>
+          <select id="txPayment" class="custom-select" style="width: 100%;">
+            <option value="Tunai / Cash">Tunai / Cash</option>
+            <option value="Uang di Orang Tua">Uang di Orang Tua (Simpanan Orang Tua)</option>
+            <option value="Uang di Mama" style="display:none;">Uang di Mama</option>
+            <option value="Bank BCA">Bank BCA</option>
+            <option value="Bank Mandiri">Bank Mandiri</option>
+            <option value="GoPay">GoPay</option>
+            <option value="OVO">OVO</option>
+            <option value="ShopeePay">ShopeePay</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="txDate">Tanggal & Waktu</label>
+          <input type="datetime-local" id="txDate" class="glass-input" required>
+        </div>
+
+        <div class="form-group">
+          <label for="txNote">Catatan (Opsional)</label>
+          <input type="text" id="txNote" class="glass-input" placeholder="Contoh: Makan siang nasi padang">
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelTx" style="flex: 1;">Batal</button>
+          <button type="submit" class="glass-button" style="flex: 1;">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Set Category Budget -->
+  <div class="modal-overlay" id="modalBudget">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2>Atur Batas Anggaran Bulanan</h2>
+        <button class="modal-close" id="btnCloseBudgetModal">&times;</button>
+      </div>
+
+      <form id="formBudget">
+        <div id="budgetInputsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Dynamically populated with category budget inputs -->
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelBudget" style="flex: 1;">Batal</button>
+          <button type="submit" class="glass-button" style="flex: 1;">Simpan Anggaran</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Backup & Settings -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2>Pengaturan Data & Backup</h2>
+        <button class="modal-close" id="btnCloseSettingsModal">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <!-- Status Akun & Keamanan Cloud (Bersih & Elegan) -->
+        <div class="settings-cloud-card">
+          <div class="settings-cloud-header">
+            <h3 style="font-size: 0.95rem; color: var(--primary-teal); display: flex; align-items: center; gap: 0.45rem; margin: 0;">
+              <i class="ri-shield-check-line"></i> Keamanan Akun & Cloud
+            </h3>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--income-green); border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.725rem; white-space: nowrap;">
+              <i class="ri-lock-2-line"></i> RLS Terproteksi
+            </span>
+          </div>
+
+          <p style="font-size: 0.825rem; color: var(--text-secondary); margin: 0.65rem 0 0.85rem 0; line-height: 1.45; word-break: break-word;">
+            Tersambung ke cloud database dengan enkripsi akun pribadi. Data keuangan Anda aman dan hanya bisa diakses oleh akun Anda.
+          </p>
+
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.4rem; overflow: hidden;">
+            <i class="ri-user-smile-line" style="color: var(--primary-teal); flex-shrink: 0;"></i>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Akun Aktif: <strong id="settingsUserEmail" style="color: var(--text-primary); word-break: break-all;">-</strong></span>
+          </div>
+
+          <div class="settings-auth-buttons">
+            <button class="glass-button secondary" id="btnSyncSettings" title="Sinkronisasi Data Real-time">
+              <i class="ri-refresh-line"></i> Sinkronisasi Sekarang
+            </button>
+            <button class="glass-button danger" id="btnLogoutSettings">
+              <i class="ri-logout-box-r-line"></i> Keluar Akun
+            </button>
+          </div>
+        </div>
+
+        <hr style="border-color: var(--glass-border); margin: 0;">
+
+        <div>
+          <h3 style="font-size: 0.95rem; margin-bottom: 0.45rem;">Ekspor Data Keuangan</h3>
+          <p style="font-size: 0.825rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.45;">
+            Download cadangan data transaksi kamu ke dalam file JSON atau CSV untuk disimpan di PC/Google Drive.
+          </p>
+          <div class="settings-grid-buttons">
+            <button class="glass-button secondary" id="btnExportJSON">
+              <i class="ri-download-2-line"></i> Ekspor JSON
+            </button>
+            <button class="glass-button secondary" id="btnExportCSV">
+              <i class="ri-file-excel-line"></i> Ekspor CSV
+            </button>
+          </div>
+          <button class="glass-button primary-cta" id="btnSettingsPrintReport" onclick="closeModal('modalSettings'); openPrintReportModal('CURRENT_MONTH');" style="width: 100%; margin-top: 0.65rem;">
+            <i class="ri-printer-line"></i> Cetak Laporan Keuangan (PDF)
+          </button>
+        </div>
+
+        <hr style="border-color: var(--glass-border);">
+
+        <div>
+          <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Impor Data Keuangan</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Pulihkan data transaksi dari file cadangan JSON yang telah di-ekspor sebelumnya.
+          </p>
+          <input type="file" id="inputImportJSON" accept=".json" style="display: none;">
+          <button class="glass-button" id="btnTriggerImport" style="width: 100%;">
+            <i class="ri-upload-2-line"></i> Pilih File JSON untuk Impor
+          </button>
+        </div>
+
+        <hr style="border-color: var(--glass-border);">
+
+        <div>
+          <h3 style="font-size: 1rem; color: var(--expense-red); margin-bottom: 0.5rem;">Reset Data</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Hapus seluruh data transaksi di perangkat ini secara permanen.
+          </p>
+          <button class="glass-button danger" id="btnClearAllData" style="width: 100%;">
+            <i class="ri-delete-bin-line"></i> Hapus Seluruh Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Supabase Auth (Login / Register) -->
+  <div class="modal-overlay" id="modalAuth">
+    <div class="glass-card modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <h2 style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="ri-copper-coin-fill" style="color: var(--primary-teal);"></i>
+          <span>Akun Artha</span>
+        </h2>
+        <button class="modal-close" id="btnCloseAuthModal">&times;</button>
+      </div>
+
+      <!-- Auth Mode Switcher (Login vs Register) -->
+      <div class="type-toggle" style="margin-bottom: 1.25rem;">
+        <div class="toggle-option active" id="tabAuthLogin" style="background: var(--primary-teal); color: #ffffff;">
+          <i class="ri-login-box-line"></i> Masuk
+        </div>
+        <div class="toggle-option" id="tabAuthRegister">
+          <i class="ri-user-add-line"></i> Buat Akun
+        </div>
+      </div>
+
+      <!-- Alert Box for Auth Messages -->
+      <div id="authAlert" style="display: none; padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+      <!-- Login Form -->
+      <form id="formLogin">
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" class="glass-input" placeholder="contoh@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Kata Sandi (Password)</label>
+          <input type="password" id="loginPassword" class="glass-input" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitLogin" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-login-circle-line"></i> Masuk ke Artha
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="formRegister" style="display: none;">
+        <div class="form-group">
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" class="glass-input" placeholder="contoh@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Kata Sandi (Password)</label>
+          <input type="password" id="registerPassword" class="glass-input" placeholder="Minimal 6 karakter" minlength="6" required>
+        </div>
+        <button type="submit" class="glass-button" id="btnSubmitRegister" style="width: 100%; margin-top: 0.5rem;">
+          <i class="ri-user-add-line"></i> Daftar Akun Baru
+        </button>
+      </form>
+
+      <div class="auth-security-badge" style="margin-top: 1.25rem; justify-content: center;">
+        <i class="ri-shield-check-line" style="color: var(--income-green);"></i>
+        <span>Terkoneksi dengan Supabase Auth & Row Level Security (RLS)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm Delete Transaction -->
+  <div class="modal-overlay" id="modalConfirmDelete">
+    <div class="glass-card modal-dialog" style="max-width: 420px; text-align: center;">
+      <div style="font-size: 3rem; color: var(--expense-red); margin-bottom: 0.5rem;">
+        <i class="ri-error-warning-line"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Konfirmasi Hapus Transaksi</h3>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Apakah Anda yakin ingin menghapus transaksi ini dari catatan? Tindakan ini tidak dapat dibatalkan.
+      </p>
+      <input type="hidden" id="deleteTxIdTarget">
+      <div style="display: flex; gap: 1rem;">
+        <button type="button" class="glass-button secondary" id="btnCancelDeleteTx" style="flex: 1;">Batal</button>
+        <button type="button" class="glass-button danger" id="btnConfirmDeleteTx" style="flex: 1;">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirm Delete User (Admin) -->
+  <div class="modal-overlay" id="modalAdminDeleteUser">
+    <div class="glass-card modal-dialog" style="max-width: 440px; text-align: center;">
+      <div style="font-size: 3rem; color: var(--expense-red); margin-bottom: 0.5rem;">
+        <i class="ri-user-unfollow-line"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Hapus Akun Pengguna</h3>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        Apakah Anda yakin ingin menghapus akun <strong id="adminDeleteUserTargetEmail" style="color: var(--text-primary);"></strong> secara permanen? Seluruh catatan transaksi dan hak akses akun ini akan dihapus.
+      </p>
+      <input type="hidden" id="adminDeleteUserIdTarget">
+      <input type="hidden" id="adminDeleteUserEmailTarget">
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="glass-button secondary" id="btnCancelAdminDeleteUser" style="flex: 1;">Batal</button>
+        <button type="button" class="glass-button danger" id="btnConfirmAdminDeleteUser" style="flex: 1;">
+          <i class="ri-delete-bin-line"></i> Ya, Hapus Akun
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Admin User Details -->
+  <div class="modal-overlay" id="modalAdminUserDetails">
+    <div class="glass-card modal-dialog" style="max-width: 460px;">
+      <div class="modal-header">
+        <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem;">
+          <i class="ri-user-settings-line" style="color: var(--brand-accent);"></i> Rincian Akun Pengguna
+        </h2>
+        <button class="modal-close" id="btnCloseAdminUserDetails">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.9rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+          <div id="modalUserDetailAvatar" class="admin-user-avatar" style="width: 48px; height: 48px; font-size: 1.3rem;">U</div>
+          <div style="min-width: 0; flex: 1;">
+            <div id="modalUserDetailEmail" style="font-weight: 700; font-size: 0.95rem; word-break: break-all;">user@email.com</div>
+            <div id="modalUserDetailRoleBadges" style="display: flex; gap: 0.4rem; margin-top: 0.35rem; flex-wrap: wrap;"></div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div style="padding: 0.75rem; background: var(--surface-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-card);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Total Transaksi</div>
+            <div id="modalUserDetailTx" style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">0 Transaksi</div>
+          </div>
+          <div style="padding: 0.75rem; background: var(--surface-subtle); border-radius: var(--radius-xs); border: 1px solid var(--border-card);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Status Kehadiran</div>
+            <div id="modalUserDetailPresence" style="font-size: 0.9rem; font-weight: 600;">Aktif</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.825rem; color: var(--text-secondary); background: var(--surface-subtle); padding: 0.75rem; border-radius: var(--radius-xs); border: 1px solid var(--border-card);">
+          <div><strong>ID Akun (UUID):</strong> <span id="modalUserDetailId" style="font-family: monospace; font-size: 0.775rem; word-break: break-all;">-</span></div>
+          <div><strong>Waktu Terdaftar:</strong> <span id="modalUserDetailCreatedAt">-</span></div>
+          <div><strong>Terakhir Masuk:</strong> <span id="modalUserDetailLastSignIn">-</span></div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+          <button type="button" class="glass-button secondary" id="btnModalUserDetailCopy" style="font-size: 0.825rem; padding: 0.45rem 0.85rem;">
+            <i class="ri-file-copy-line"></i> Salin Email
+          </button>
+          <button type="button" class="glass-button secondary" id="btnModalUserDetailResetPass" style="font-size: 0.825rem; padding: 0.45rem 0.85rem;">
+            <i class="ri-key-2-line"></i> Reset Sandi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Kelola Uang di Orang Tua -->
+  <div class="modal-overlay" id="modalMomMoney">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2 style="display: flex; align-items: center; gap: 0.5rem; color: #f472b6;">
+          <i class="ri-heart-3-line"></i> Kelola Uang di Orang Tua
+        </h2>
+        <button class="modal-close" id="btnCloseMomModal">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: var(--radius-sm); text-align: center;">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Saldo Uang di Orang Tua Saat Ini:</span>
+        <div id="modalMomBalanceVal" style="font-size: 2rem; font-weight: 700; color: #f472b6; margin-top: 0.2rem;">Rp 0</div>
+      </div>
+
+      <!-- Action Tabs / Buttons -->
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        
+        <!-- Action 1: Tarik Uang dari Orang Tua -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-sm);">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--income-green);">
+            <i class="ri-hand-coin-line"></i> Ambil / Tarik Uang dari Orang Tua
+          </h4>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Orang tua memberikan sebagian uang simpanan kamu (akan mengurangi saldo simpanan & menambah saldo aktif).
+          </p>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <input type="number" id="momWithdrawAmount" class="glass-input" placeholder="Jumlah (Rp), contoh: 500000" min="1">
+            <button class="glass-button" id="btnWithdrawMom" style="white-space: nowrap;">Tarik Uang</button>
+          </div>
+        </div>
+
+        <!-- Action 2: Titip Uang ke Orang Tua -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-sm);">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--primary-teal);">
+            <i class="ri-safe-line"></i> Titip Uang Tambahan ke Orang Tua
+          </h4>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Menambah jumlah simpanan kamu yang dipegang oleh Orang Tua.
+          </p>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <input type="number" id="momDepositAmount" class="glass-input" placeholder="Jumlah (Rp), contoh: 200000" min="1">
+            <button class="glass-button secondary" id="btnDepositMom" style="white-space: nowrap;">Titip Uang</button>
+          </div>
+        </div>
+
+        <!-- Action 3: Direct Update Saldo -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 1rem; border-radius: var(--radius-sm);">
+          <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">
+            <i class="ri-edit-2-line"></i> Edit Total Saldo Langsung
+          </h4>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="number" id="momDirectAmount" class="glass-input" placeholder="Set Saldo Baru (Rp)" value="0">
+            <button class="glass-button secondary" id="btnSetMomBalance" style="white-space: nowrap;">Simpan Saldo</button>
+          </div>
+        </div>
+
+  <!-- Modal: Tambah / Edit Target Celengan Impian -->
+  <div class="modal-overlay" id="modalSavingsGoal">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalSavingsGoalTitle" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="ri-copper-coin-fill" style="color: var(--brand-accent);"></i>
+          <span>Target Celengan Impian</span>
+        </h2>
+        <button class="modal-close" id="btnCloseSavingsGoalModal">&times;</button>
+      </div>
+
+      <form id="formSavingsGoal">
+        <input type="hidden" id="savingsGoalId">
+
+        <div class="form-group">
+          <label for="savingsGoalTitle">Nama Impian / Target</label>
+          <input type="text" id="savingsGoalTitle" class="glass-input" placeholder="Contoh: Laptop Kerja Baru / Liburan Akhir Tahun" required>
+        </div>
+
+        <div class="form-group">
+          <label for="savingsGoalTargetAmount">Target Nominal (Rp)</label>
+          <input type="number" id="savingsGoalTargetAmount" class="glass-input" placeholder="Contoh: 15000000" min="10000" required>
+        </div>
+
+        <div class="form-group">
+          <label for="savingsGoalCurrentAmount">Saldo Awal Terkumpul (Rp)</label>
+          <input type="number" id="savingsGoalCurrentAmount" class="glass-input" placeholder="0 jika baru mulai" min="0" value="0">
+        </div>
+
+        <div class="form-group">
+          <label for="savingsGoalCategory">Kategori Impian</label>
+          <select id="savingsGoalCategory" class="custom-select" style="width: 100%;">
+            <option value="Elektronik & Gadget">Elektronik & Gadget</option>
+            <option value="Dana Darurat">Dana Darurat</option>
+            <option value="Liburan & Perjalanan">Liburan & Perjalanan</option>
+            <option value="Kendaraan & Transport">Kendaraan & Transport</option>
+            <option value="Pendidikan & Kursus">Pendidikan & Kursus</option>
+            <option value="Kebutuhan Rumah">Kebutuhan Rumah</option>
+            <option value="Investasi Masa Depan">Investasi Masa Depan</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="savingsGoalTargetDate">Target Tanggal Tercapai</label>
+          <input type="date" id="savingsGoalTargetDate" class="glass-input">
+        </div>
+
+        <div class="form-group">
+          <label for="savingsGoalNote">Catatan / Rencana Menabung (Opsional)</label>
+          <input type="text" id="savingsGoalNote" class="glass-input" placeholder="Contoh: Sisihkan Rp 500.000 setiap awal bulan">
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelSavingsGoal" style="flex: 1;">Batal</button>
+          <button type="submit" class="glass-button" style="flex: 1;">Simpan Impian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Setor / Tarik Dana Celengan Impian -->
+  <div class="modal-overlay" id="modalDepositGoal">
+    <div class="glass-card modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <h2 style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem;">
+          <i class="ri-copper-coin-line" style="color: var(--income-green);"></i>
+          <span id="depositGoalModalTitle">Kelola Dana Celengan</span>
+        </h2>
+        <button class="modal-close" id="btnCloseDepositGoalModal">&times;</button>
+      </div>
+
+      <div style="margin: 1rem 0; padding: 1rem; background: var(--surface-subtle); border-radius: var(--radius-sm); border: 1px solid var(--border-card);">
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.2rem;">Target Impian:</div>
+        <div id="depositGoalTargetName" style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.5rem;">-</div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.825rem;">
+          <span>Terkumpul: <strong id="depositGoalCurrentVal" style="color: var(--income-green);">Rp 0</strong></span>
+          <span>Target: <strong id="depositGoalTargetVal">Rp 0</strong></span>
+        </div>
+      </div>
+
+      <form id="formDepositGoal">
+        <input type="hidden" id="depositGoalTargetId">
+
+        <div class="form-group">
+          <label>Jenis Transaksi Celengan</label>
+          <div class="type-toggle">
+            <div class="toggle-option active income" id="btnDepositGoalTypeAdd">
+              <i class="ri-add-circle-line"></i> Setor Tabungan
+            </div>
+            <div class="toggle-option" id="btnDepositGoalTypeSub">
+              <i class="ri-subtract-line"></i> Tarik Sebagian
+            </div>
+          </div>
+          <input type="hidden" id="depositGoalActionType" value="ADD">
+        </div>
+
+        <div class="form-group">
+          <label for="depositGoalAmount">Jumlah Nominal (Rp)</label>
+          <input type="number" id="depositGoalAmount" class="glass-input" placeholder="Contoh: 100000" min="1000" required>
+        </div>
+
+        <div class="form-group">
+          <label for="depositGoalNote">Catatan Transaksi (Opsional)</label>
+          <input type="text" id="depositGoalNote" class="glass-input" placeholder="Contoh: Tabungan dari sisa jajan minggu ini">
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelDepositGoal" style="flex: 1;">Batal</button>
+          <button type="submit" class="glass-button" style="flex: 1;">Simpan Transaksi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Tambah / Edit Catatan Hutang & Piutang -->
+  <div class="modal-overlay" id="modalDebt">
+    <div class="glass-card modal-dialog">
+      <div class="modal-header">
+        <h2 id="modalDebtTitle" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="ri-hand-coin-line" style="color: var(--warning-amber);"></i>
+          <span>Catatan Hutang & Piutang</span>
+        </h2>
+        <button class="modal-close" id="btnCloseDebtModal">&times;</button>
+      </div>
+
+      <form id="formDebt">
+        <input type="hidden" id="debtRecordId">
+
+        <div class="form-group">
+          <label>Jenis Catatan</label>
+          <div class="type-toggle">
+            <div class="toggle-option active expense" id="btnDebtTypeDebt">
+              <i class="ri-arrow-up-circle-line"></i> Hutang Saya (Wajib Bayar)
+            </div>
+            <div class="toggle-option" id="btnDebtTypeLoan">
+              <i class="ri-arrow-down-circle-line"></i> Piutang (Saya Tagih)
+            </div>
+          </div>
+          <input type="hidden" id="debtTypeVal" value="DEBT">
+        </div>
+
+        <div class="form-group">
+          <label for="debtPersonName">Nama Pihak / Teman / Kontak</label>
+          <input type="text" id="debtPersonName" class="glass-input" placeholder="Contoh: Budi Santoso / Toko Elektronik" required>
+        </div>
+
+        <div class="form-group">
+          <label for="debtAmount">Nominal (Rp)</label>
+          <input type="number" id="debtAmount" class="glass-input" placeholder="Contoh: 250000" min="1000" required>
+        </div>
+
+        <div class="form-group">
+          <label for="debtDueDate">Tenggat Waktu / Janji Bayar (Opsional)</label>
+          <input type="date" id="debtDueDate" class="glass-input">
+        </div>
+
+        <div class="form-group">
+          <label for="debtNote">Keterangan / Keperluan (Opsional)</label>
+          <input type="text" id="debtNote" class="glass-input" placeholder="Contoh: Talangan makan bareng / Pinjaman modal">
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelDebt" style="flex: 1;">Batal</button>
+          <button type="submit" class="glass-button" style="flex: 1;">Simpan Catatan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Pratinjau & Cetak Laporan Keuangan (PDF Ready) -->
+  <div id="modalPrintReportPreview" class="modal-overlay">
+    <div class="glass-card modal-dialog modal-print-dialog" style="max-width: 900px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      <!-- Modal Header -->
+      <div class="modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--surface-card); margin-bottom: 0;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-accent-subtle); color: var(--brand-accent); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="ri-file-chart-line"></i>
+          </div>
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">Laporan Keuangan</h2>
+            <div style="font-size: 0.775rem; color: var(--text-secondary);">Pratinjau Dokumen Resmi & Ekspor PDF</div>
+          </div>
+        </div>
+        <button type="button" class="close-btn" id="btnClosePrintReportModal" onclick="closeModal('modalPrintReportPreview')">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+
+      <!-- Controls Toolbar -->
+      <div style="padding: 0.85rem 1.5rem; background: var(--surface-subtle); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <label for="selectPrintReportPeriod" style="font-size: 0.825rem; font-weight: 600; color: var(--text-secondary);"><i class="ri-calendar-event-line"></i> Periode:</label>
+          <select id="selectPrintReportPeriod" onchange="openPrintReportModal(this.value)" class="glass-select" style="padding: 0.35rem 0.75rem; font-size: 0.825rem; min-width: 180px;">
+            <option value="CURRENT_MONTH">Bulan Ini</option>
+            <option value="ALL">Semua Waktu (Seluruh Catatan)</option>
+            <option value="FILTERED">Sesuai Filter Tampilan</option>
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <button type="button" class="glass-button secondary" id="btnCancelPrintReportModal" onclick="closeModal('modalPrintReportPreview')" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
+            Tutup
+          </button>
+          <button type="button" class="glass-button primary-cta" id="btnExecutePrintDoc" onclick="executePrintDocument()" style="padding: 0.45rem 1rem; font-size: 0.85rem;">
+            <i class="ri-printer-line"></i> Cetak / Simpan PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Document Preview Sheet -->
+      <div style="flex: 1; overflow-y: auto; padding: 1.5rem; background: rgba(0,0,0,0.22); -webkit-overflow-scrolling: touch;">
+        <div id="printReportDocPreview" class="print-preview-sheet" style="background: #ffffff; color: #0f172a; border-radius: var(--radius-sm); padding: 2rem; box-shadow: 0 4px 25px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
+          <!-- Dynamically populated report content -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- /#appContainer -->
+
+  <!-- Printable Financial Statement Container (Direct child of body, screen-hidden, visible in @media print) -->
+  <div id="printReportContainer" class="print-statement-container"></div>
+
+  <!-- Application Logic Modular JS Scripts -->
+  <script type="module" src="js/main.js?v=58"></script>
+
+</body>
+</html>
