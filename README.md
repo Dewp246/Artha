@@ -1,6 +1,6 @@
 # 💰 Artha — Modern Personal Financial Tracker
 
-Aplikasi manajemen kas, catatan keuangan pribadi, dan pelacakan anggaran modern berbasis Progressive Web App (PWA) dengan antarmuka Glassmorphism yang responsif, elegan, dan dinamis.
+Aplikasi manajemen kas, catatan keuangan pribadi, dan pelacakan anggaran modern berbasis Progressive Web App (PWA) dengan antarmuka Glassmorphism yang responsif, elegan, dan dinamis. artha.my.id
 
 ---
 
