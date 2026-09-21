@@ -255,6 +255,12 @@ export function renderOverspendingAlerts() {
   const banner = document.getElementById('overspendingAlertBanner');
   if (!banner) return;
 
+  // If user dismissed the banner this session, keep hidden
+  if (sessionStorage.getItem('overspendingAlertDismissed') === '1') {
+    banner.style.display = 'none';
+    return;
+  }
+
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
@@ -327,6 +333,18 @@ export function renderOverspendingAlerts() {
           ${chipsHtml}
         </div>
       </div>
+      <button class="overspending-close-btn" id="btnCloseOverspendingAlert" title="Tutup peringatan" aria-label="Tutup">
+        <i class="ri-close-line"></i>
+      </button>
     </div>
   `;
+
+  // Attach close handler
+  const closeBtn = document.getElementById('btnCloseOverspendingAlert');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      sessionStorage.setItem('overspendingAlertDismissed', '1');
+      banner.style.display = 'none';
+    });
+  }
 }

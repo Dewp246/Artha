@@ -28,7 +28,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=58">
+  <link rel="stylesheet" href="style.css?v=61">
 </head>
 <body>
 
@@ -68,7 +68,7 @@
             <a href="javascript:void(0)" id="btnOpenForgotPassword" style="font-size: 0.775rem; color: var(--brand-accent); text-decoration: none; font-weight: 500;">Lupa kata sandi?</a>
           </div>
           <div class="password-input-wrapper">
-            <input type="password" id="screenLoginPassword" class="glass-input" placeholder="••••••••" autocomplete="current-password" required>
+            <input type="password" id="screenLoginPassword" class="glass-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password" required>
             <button type="button" class="password-toggle-btn" id="btnToggleLoginPass" title="Tampilkan/Sembunyikan Kata Sandi">
               <i class="ri-eye-line" id="iconToggleLoginPass"></i>
             </button>
@@ -291,71 +291,6 @@
       <!-- Overspending Alert Banner (Automatic Threshold Monitor) -->
       <div id="overspendingAlertBanner" class="overspending-banner-container" style="display: none;"></div>
 
-      <!-- Financial Health Score & 50/30/20 Smart Insights -->
-      <section class="glass-card financial-health-card" id="financialHealthSection" style="margin-bottom: 1.5rem;">
-        <div class="financial-health-header">
-          <div class="health-header-left">
-            <div class="health-icon-pulse">
-              <i class="ri-heart-pulse-line"></i>
-            </div>
-            <div>
-              <div class="chart-title">Financial Health Score & Analisis 50/30/20</div>
-              <div class="chart-subtitle">Evaluasi rasio tabungan, kestabilan kas, dan rekomendasi cerdas</div>
-            </div>
-          </div>
-          <div class="health-score-badge" id="healthScoreBadge">
-            <span class="health-score-val" id="valHealthScore">--</span>
-            <span class="health-score-label" id="lblHealthStatus">Mengalkulasi...</span>
-          </div>
-        </div>
-
-        <div class="health-body-grid">
-          <!-- 50/30/20 Rule Progress Bars -->
-          <div class="health-allocations">
-            <div class="allocation-item">
-              <div class="allocation-labels">
-                <span><i class="ri-home-4-line"></i> Kebutuhan Pokok (Target &le; 50%)</span>
-                <strong id="valNeedsRatio">0%</strong>
-              </div>
-              <div class="allocation-bar-track">
-                <div class="allocation-bar-fill needs" id="barNeedsFill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <div class="allocation-item">
-              <div class="allocation-labels">
-                <span><i class="ri-gamepad-line"></i> Keinginan & Gaya Hidup (Target &le; 30%)</span>
-                <strong id="valWantsRatio">0%</strong>
-              </div>
-              <div class="allocation-bar-track">
-                <div class="allocation-bar-fill wants" id="barWantsFill" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <div class="allocation-item">
-              <div class="allocation-labels">
-                <span><i class="ri-copper-coin-line"></i> Tabungan & Investasi (Target &ge; 20%)</span>
-                <strong id="valSavingsRatio">0%</strong>
-              </div>
-              <div class="allocation-bar-track">
-                <div class="allocation-bar-fill savings" id="barSavingsFill" style="width: 0%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Smart Recommendation Tips Box -->
-          <div class="health-smart-tip-box" id="healthSmartTipBox">
-            <div class="smart-tip-title">
-              <i class="ri-lightbulb-line" style="color: var(--warning-amber);"></i>
-              <span>Insight Keuangan Cerdas</span>
-            </div>
-            <div class="smart-tip-text" id="healthSmartTipText">
-              Catat pengeluaran Anda bulan ini untuk membuka rekomendasi finansial berbasis data.
-            </div>
-          </div>
-        </div>
-      </section>
-      
       <!-- Metrics Summary Cards -->
       <section class="metrics-grid">
         <div class="glass-card metric-card glow">
@@ -454,6 +389,71 @@
            <!-- Dynamic Recent Tx populated via JS -->
          </div>
        </section>
+
+      <!-- Financial Health Score & 50/30/20 Smart Insights -->
+      <section class="glass-card financial-health-card" id="financialHealthSection" style="margin-bottom: 1.5rem;">
+        <div class="financial-health-header">
+          <div class="health-header-left">
+            <div class="health-icon-pulse">
+              <i class="ri-heart-pulse-line"></i>
+            </div>
+            <div>
+              <div class="chart-title">Financial Health Score &amp; Analisis 50/30/20</div>
+              <div class="chart-subtitle">Evaluasi rasio tabungan, kestabilan kas, dan rekomendasi cerdas</div>
+            </div>
+          </div>
+          <div class="health-score-badge" id="healthScoreBadge">
+            <span class="health-score-val" id="valHealthScore">--</span>
+            <span class="health-score-label" id="lblHealthStatus">Mengalkulasi...</span>
+          </div>
+        </div>
+
+        <div class="health-body-grid">
+          <!-- 50/30/20 Rule Progress Bars -->
+          <div class="health-allocations">
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-home-4-line"></i> Kebutuhan Pokok (Target &le; 50%)</span>
+                <strong id="valNeedsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill needs" id="barNeedsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-gamepad-line"></i> Keinginan &amp; Gaya Hidup (Target &le; 30%)</span>
+                <strong id="valWantsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill wants" id="barWantsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="allocation-item">
+              <div class="allocation-labels">
+                <span><i class="ri-copper-coin-line"></i> Tabungan &amp; Investasi (Target &ge; 20%)</span>
+                <strong id="valSavingsRatio">0%</strong>
+              </div>
+              <div class="allocation-bar-track">
+                <div class="allocation-bar-fill savings" id="barSavingsFill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smart Recommendation Tips Box -->
+          <div class="health-smart-tip-box" id="healthSmartTipBox">
+            <div class="smart-tip-title">
+              <i class="ri-lightbulb-line" style="color: var(--warning-amber);"></i>
+              <span>Insight Keuangan Cerdas</span>
+            </div>
+            <div class="smart-tip-text" id="healthSmartTipText">
+              Catat pengeluaran Anda bulan ini untuk membuka rekomendasi finansial berbasis data.
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Budget Limits & Category Breakdown Section -->
       <section class="section-grid">
@@ -781,7 +781,7 @@
             </div>
           </div>
           <div class="metric-value" style="font-size: 1.15rem; color: var(--income-green);">Aktif (Gmail)</div>
-          <div class="metric-subtitle">Port 465 • SSL Terenkripsi</div>
+          <div class="metric-subtitle">Port 465 â€¢ SSL Terenkripsi</div>
         </div>
       </section>
 
@@ -830,7 +830,7 @@
                   <i class="ri-mail-send-line" style="color: var(--warning-amber); font-size: 1.15rem;"></i>
                   <div>
                     <div style="font-weight: 600; font-size: 0.875rem;">Gmail SMTP Gateway</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Host: smtp.gmail.com • Auth: App Passwords</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Host: smtp.gmail.com â€¢ Auth: App Passwords</div>
                   </div>
                 </div>
                 <span class="badge income">Terkonfigurasi</span>
@@ -852,7 +852,7 @@
                   <i class="ri-apps-line" style="color: var(--savings-indigo); font-size: 1.15rem;"></i>
                   <div>
                     <div style="font-weight: 600; font-size: 0.875rem;">PWA Cache & Service Worker</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Versi Cache: artha-v48 • Dukungan Offline Aktif</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Versi Cache: artha-v48 â€¢ Dukungan Offline Aktif</div>
                   </div>
                 </div>
                 <span class="badge income">Sinkron</span>
@@ -1180,7 +1180,7 @@
         </div>
         <div class="form-group">
           <label for="loginPassword">Kata Sandi (Password)</label>
-          <input type="password" id="loginPassword" class="glass-input" placeholder="••••••••" required>
+          <input type="password" id="loginPassword" class="glass-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required>
         </div>
         <button type="submit" class="glass-button" id="btnSubmitLogin" style="width: 100%; margin-top: 0.5rem;">
           <i class="ri-login-circle-line"></i> Masuk ke Artha
@@ -1525,7 +1525,7 @@
   </div> <!-- /#appContainer -->
 
   <!-- Application Logic Modular JS Scripts -->
-  <script type="module" src="js/main.js?v=60"></script>
+  <script type="module" src="js/main.js?v=61"></script>
 
 </body>
 </html>
