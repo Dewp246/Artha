@@ -92,12 +92,7 @@ import {
   toggleDebtPaidStatus,
   deleteDebt
 } from './modules/debts.js';
-import {
-  compileFinancialReportHtml,
-  openPrintReportModal,
-  executePrintDocument,
-  generateAndPrintMonthlyReport
-} from './modules/reports.js';
+
 import {
   renderCharts,
   renderCashFlowChart,
@@ -527,26 +522,6 @@ function setupEventListeners() {
     renderTransactionsTable();
   });
 
-  // Print Report Buttons (Header, Filtered, Settings)
-  document.getElementById('btnPrintReport')?.addEventListener('click', () => openPrintReportModal('CURRENT_MONTH'));
-  document.getElementById('btnPrintFilteredTx')?.addEventListener('click', () => openPrintReportModal('FILTERED'));
-  document.getElementById('btnSettingsPrintReport')?.addEventListener('click', () => {
-    closeModal('modalSettings');
-    openPrintReportModal('CURRENT_MONTH');
-  });
-
-  // Print Report Modal Controls
-  document.getElementById('btnClosePrintReportModal')?.addEventListener('click', () => closeModal('modalPrintReportPreview'));
-  document.getElementById('btnCancelPrintReportModal')?.addEventListener('click', () => closeModal('modalPrintReportPreview'));
-  document.getElementById('btnExecutePrintDoc')?.addEventListener('click', executePrintDocument);
-  document.getElementById('selectPrintReportPeriod')?.addEventListener('change', (e) => {
-    const previewEl = document.getElementById('printReportDocPreview');
-    const printContainer = document.getElementById('printReportContainer');
-    const html = compileFinancialReportHtml(e.target.value);
-    if (previewEl) previewEl.innerHTML = html;
-    if (printContainer) printContainer.innerHTML = html;
-  });
-
   // Global Broadcast Banner & Admin Broadcast Handlers
   document.getElementById('btnCloseBroadcastBanner')?.addEventListener('click', () => {
     const banner = document.getElementById('globalBroadcastBanner');
@@ -586,8 +561,7 @@ function setupEventListeners() {
 window.renderApp = renderApp;
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.openPrintReportModal = openPrintReportModal;
-window.executePrintDocument = executePrintDocument;
+
 window.openAddTxModal = openAddTxModal;
 window.editTransaction = editTransaction;
 window.deleteTransaction = deleteTransaction;

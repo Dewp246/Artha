@@ -81,6 +81,10 @@ export function initSupabaseAuth(onRender) {
   const supabaseClient = getSupabaseClient();
   if (!supabaseClient) return;
 
+  // Guard flag: prevent double-fetch when onAuthStateChange fires SIGNED_IN
+  // simultaneously with getSession().then() on page load
+  let sessionInitialized = false;
+
   // Listen to auth state changes
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
@@ -88,7 +92,11 @@ export function initSupabaseAuth(onRender) {
       return;
     }
 
+    // Skip SIGNED_IN fired by onAuthStateChange if getSession already handled it
+    if (event === 'SIGNED_IN' && sessionInitialized) return;
+
     if (session && session.user) {
+      sessionInitialized = true;
       recordKnownUser(session.user.email);
       appState.user = session.user;
       loadUserLocalData(session.user.id);
@@ -96,6 +104,7 @@ export function initSupabaseAuth(onRender) {
       await fetchFromSupabase(onRender);
       subscribeToSupabaseRealtime(() => fetchFromSupabase(onRender));
     } else {
+      sessionInitialized = false;
       appState.user = null;
       resetAppStateData();
       updateAuthUI(false, null);
@@ -116,6 +125,8 @@ export function initSupabaseAuth(onRender) {
     }
 
     if (session && session.user) {
+      // Mark as initialized so onAuthStateChange SIGNED_IN is skipped
+      sessionInitialized = true;
       recordKnownUser(session.user.email);
       appState.user = session.user;
       loadUserLocalData(session.user.id);

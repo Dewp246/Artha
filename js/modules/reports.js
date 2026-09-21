@@ -269,20 +269,98 @@ export function openPrintReportModal(preset = 'CURRENT_MONTH') {
 export function executePrintDocument() {
   try {
     const previewEl = document.getElementById('printReportDocPreview');
-    const printContainer = document.getElementById('printReportContainer');
-    if (!previewEl) return;
-
-    const html = previewEl.innerHTML;
-    if (printContainer) {
-      printContainer.innerHTML = html;
+    if (!previewEl) {
+      showToast('Konten laporan tidak ditemukan.', 'danger');
+      return;
     }
 
-    setTimeout(() => {
-      window.print();
-    }, 100);
+    const reportHtml = previewEl.innerHTML;
+
+    // Open a dedicated print window so window.print() doesn't freeze the app
+    const printWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
+    if (!printWindow) {
+      showToast('Popup diblokir browser. Izinkan popup untuk mencetak.', 'warning');
+      return;
+    }
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Keuangan - Artha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 10pt;
+      color: #0f172a;
+      background: #ffffff;
+      padding: 20px;
+    }
+    .print-preview-sheet {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { text-align: left; }
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print { display: none !important; }
+    }
+    .print-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .print-actions button {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .print-actions button:hover { opacity: 0.85; }
+    .btn-print { background: #4f46e5; color: #fff; }
+    .btn-close { background: #f1f5f9; color: #334155; }
+  </style>
+</head>
+<body>
+  <div class="print-actions no-print">
+    <button class="btn-close" onclick="window.close()">✕ Tutup</button>
+    <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+  </div>
+  <div class="print-preview-sheet">
+    ${reportHtml}
+  </div>
+  <script>
+    // Auto-trigger print dialog after fonts load
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        window.print();
+      }, 800);
+    });
+  <\/script>
+</body>
+</html>`);
+
+    printWindow.document.close();
+    printWindow.focus();
+
   } catch (err) {
     console.error('Error saat mencetak dokumen:', err);
-    window.print();
+    showToast('Gagal mencetak: ' + err.message, 'danger');
   }
 }
 

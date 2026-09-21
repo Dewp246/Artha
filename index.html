@@ -276,10 +276,7 @@
           <span id="themeToggleText">Light Mode</span>
         </button>
 
-        <button class="glass-button secondary" id="btnPrintReport" onclick="openPrintReportModal('CURRENT_MONTH')" title="Cetak Laporan Keuangan Bulanan (PDF)">
-          <i class="ri-printer-line"></i>
-          <span class="btn-text-responsive">Cetak Laporan</span>
-        </button>
+
 
         <button class="glass-button primary-cta" id="btnOpenAddTxModal">
           <i class="ri-add-line"></i>
@@ -503,10 +500,7 @@
               <input type="text" class="glass-input" id="searchTxInput" placeholder="Cari transaksi berdasarkan catatan, kategori, atau metode (Ctrl+K)...">
               <span class="search-shortcut-hint">/</span>
             </div>
-            <button class="glass-button secondary" id="btnPrintFilteredTx" onclick="openPrintReportModal('FILTERED')" title="Cetak Riwayat Transaksi Saat Ini">
-              <i class="ri-printer-line"></i>
-              <span>Cetak Hasil</span>
-            </button>
+
             <button class="glass-button secondary" id="btnResetTxFilter" title="Reset Semua Filter" style="display: none;">
               <i class="ri-filter-off-line"></i>
               <span>Reset Filter</span>
@@ -1123,9 +1117,7 @@
               <i class="ri-file-excel-line"></i> Ekspor CSV
             </button>
           </div>
-          <button class="glass-button primary-cta" id="btnSettingsPrintReport" onclick="closeModal('modalSettings'); openPrintReportModal('CURRENT_MONTH');" style="width: 100%; margin-top: 0.65rem;">
-            <i class="ri-printer-line"></i> Cetak Laporan Keuangan (PDF)
-          </button>
+
         </div>
 
         <hr style="border-color: var(--glass-border);">
@@ -1530,61 +1522,10 @@
     </div>
   </div>
 
-  <!-- Modal Pratinjau & Cetak Laporan Keuangan (PDF Ready) -->
-  <div id="modalPrintReportPreview" class="modal-overlay">
-    <div class="glass-card modal-dialog modal-print-dialog" style="max-width: 900px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
-      <!-- Modal Header -->
-      <div class="modal-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--surface-card); margin-bottom: 0;">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <div style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-accent-subtle); color: var(--brand-accent); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-            <i class="ri-file-chart-line"></i>
-          </div>
-          <div>
-            <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">Laporan Keuangan</h2>
-            <div style="font-size: 0.775rem; color: var(--text-secondary);">Pratinjau Dokumen Resmi & Ekspor PDF</div>
-          </div>
-        </div>
-        <button type="button" class="close-btn" id="btnClosePrintReportModal" onclick="closeModal('modalPrintReportPreview')">
-          <i class="ri-close-line"></i>
-        </button>
-      </div>
-
-      <!-- Controls Toolbar -->
-      <div style="padding: 0.85rem 1.5rem; background: var(--surface-subtle); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <label for="selectPrintReportPeriod" style="font-size: 0.825rem; font-weight: 600; color: var(--text-secondary);"><i class="ri-calendar-event-line"></i> Periode:</label>
-          <select id="selectPrintReportPeriod" onchange="openPrintReportModal(this.value)" class="glass-select" style="padding: 0.35rem 0.75rem; font-size: 0.825rem; min-width: 180px;">
-            <option value="CURRENT_MONTH">Bulan Ini</option>
-            <option value="ALL">Semua Waktu (Seluruh Catatan)</option>
-            <option value="FILTERED">Sesuai Filter Tampilan</option>
-          </select>
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <button type="button" class="glass-button secondary" id="btnCancelPrintReportModal" onclick="closeModal('modalPrintReportPreview')" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
-            Tutup
-          </button>
-          <button type="button" class="glass-button primary-cta" id="btnExecutePrintDoc" onclick="executePrintDocument()" style="padding: 0.45rem 1rem; font-size: 0.85rem;">
-            <i class="ri-printer-line"></i> Cetak / Simpan PDF
-          </button>
-        </div>
-      </div>
-
-      <!-- Scrollable Document Preview Sheet -->
-      <div style="flex: 1; overflow-y: auto; padding: 1.5rem; background: rgba(0,0,0,0.22); -webkit-overflow-scrolling: touch;">
-        <div id="printReportDocPreview" class="print-preview-sheet" style="background: #ffffff; color: #0f172a; border-radius: var(--radius-sm); padding: 2rem; box-shadow: 0 4px 25px rgba(0,0,0,0.3); font-family: 'Inter', sans-serif;">
-          <!-- Dynamically populated report content -->
-        </div>
-      </div>
-    </div>
-  </div>
-
   </div> <!-- /#appContainer -->
 
-  <!-- Printable Financial Statement Container (Direct child of body, screen-hidden, visible in @media print) -->
-  <div id="printReportContainer" class="print-statement-container"></div>
-
   <!-- Application Logic Modular JS Scripts -->
-  <script type="module" src="js/main.js?v=58"></script>
+  <script type="module" src="js/main.js?v=60"></script>
 
 </body>
 </html>
