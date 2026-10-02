@@ -387,9 +387,9 @@ function setupEventListeners() {
   });
 
   // Uang di Orang Tua Actions
-  document.getElementById('btnWithdrawMom')?.addEventListener('click', handleWithdrawMom);
-  document.getElementById('btnDepositMom')?.addEventListener('click', handleDepositMom);
-  document.getElementById('btnSetMomBalance')?.addEventListener('click', handleSetMomBalance);
+  document.getElementById('btnWithdrawMom')?.addEventListener('click', () => handleWithdrawMom(renderApp));
+  document.getElementById('btnDepositMom')?.addEventListener('click', () => handleDepositMom(renderApp));
+  document.getElementById('btnSetMomBalance')?.addEventListener('click', () => handleSetMomBalance(renderApp));
 
   // Toggle Expense / Income in Transaction Modal
   const btnExpense = document.getElementById('btnToggleExpense');
