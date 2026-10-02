@@ -193,9 +193,7 @@ export async function pushToSupabase() {
       await pushTransactionsArray(cleanTx, userId);
     }
 
-    const settingsObj = {
-      id: userId,
-      user_id: userId,
+    const settingsPayload = {
       budgets: appState.budgets,
       mom_balance: appState.momBalance,
       savings_goals: appState.savingsGoals || [],
@@ -204,8 +202,24 @@ export async function pushToSupabase() {
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabaseClient.from('user_settings').upsert(settingsObj, { onConflict: 'id' });
-    if (error) console.warn('Supabase push user_settings error:', error);
+    // Strategy: try UPDATE first (record should already exist), fallback to INSERT
+    const { error: updateError, count } = await supabaseClient
+      .from('user_settings')
+      .update(settingsPayload)
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.warn('Supabase UPDATE user_settings error:', JSON.stringify(updateError));
+
+      // Fallback: try upsert with full object
+      const { error: upsertError } = await supabaseClient
+        .from('user_settings')
+        .upsert({ id: userId, user_id: userId, ...settingsPayload }, { onConflict: 'id' });
+
+      if (upsertError) {
+        console.warn('Supabase UPSERT user_settings fallback error:', JSON.stringify(upsertError));
+      }
+    }
 
   } catch (err) {
     console.warn('Supabase push error:', err);
