@@ -164,14 +164,14 @@ export function updateAdminPresenceUI() {
 }
 
 let realtimeSyncTimer = null;
-let skipNextRealtimeSync = false;
+let selfPushCooldownUntil = 0;
 
 // Call this from pushToSupabase to prevent the realtime listener
-// from immediately re-fetching data we just pushed ourselves
+// from re-fetching data we just pushed ourselves.
+// Uses a cooldown timestamp instead of a boolean flag so ALL events
+// within the window are ignored (not just the first one).
 export function markSelfPush() {
-  skipNextRealtimeSync = true;
-  // Reset after 3 seconds in case the realtime event doesn't fire
-  setTimeout(() => { skipNextRealtimeSync = false; }, 3000);
+  selfPushCooldownUntil = Date.now() + 4000; // ignore events for 4 seconds
 }
 
 export function subscribeToSupabaseRealtime(onSyncTrigger) {
@@ -205,9 +205,8 @@ export function subscribeToSupabaseRealtime(onSyncTrigger) {
 }
 
 function debouncedSync(onSyncTrigger) {
-  // If we just pushed data ourselves, skip this sync event
-  if (skipNextRealtimeSync) {
-    skipNextRealtimeSync = false;
+  // If we're still within the cooldown window after our own push, skip
+  if (Date.now() < selfPushCooldownUntil) {
     return;
   }
   // Debounce: wait 2 seconds before fetching to avoid rapid re-fetches

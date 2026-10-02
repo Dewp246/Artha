@@ -1,10 +1,10 @@
-const CACHE_NAME = 'artha-v66';
+const CACHE_NAME = 'artha-v67';
 const ASSETS = [
   './',
   './index.html',
-  './style.css?v=66',
+  './style.css?v=67',
   './style.css',
-  './js/main.js?v=66',
+  './js/main.js?v=67',
   './js/main.js',
   './js/config.js',
   './js/utils.js',
