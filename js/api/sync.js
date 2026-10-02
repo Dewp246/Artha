@@ -5,6 +5,7 @@
 import { getSupabaseClient, initSupabaseClient } from './supabase.js';
 import { appState, getDeletedIds, addDeletedId, resetAppStateData } from '../state.js';
 import { STORAGE_KEYS, DEFAULT_BUDGETS, cleanSupabaseUrl } from '../config.js';
+import { markSelfPush } from './presence.js';
 export { subscribeToSupabaseRealtime, markSelfPush } from './presence.js';
 
 export async function pushTransactionsArray(txList, userId) {
