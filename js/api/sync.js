@@ -5,7 +5,7 @@
 import { getSupabaseClient, initSupabaseClient } from './supabase.js';
 import { appState, getDeletedIds, addDeletedId, resetAppStateData } from '../state.js';
 import { STORAGE_KEYS, DEFAULT_BUDGETS, cleanSupabaseUrl } from '../config.js';
-export { subscribeToSupabaseRealtime } from './presence.js';
+export { subscribeToSupabaseRealtime, markSelfPush } from './presence.js';
 
 export async function pushTransactionsArray(txList, userId) {
   const supabaseClient = getSupabaseClient();
@@ -166,6 +166,10 @@ export async function fetchFromSupabase(onRender) {
 export async function pushToSupabase() {
   const supabaseClient = getSupabaseClient();
   if (!supabaseClient) return;
+
+  // Mark that we're pushing data ourselves, so the realtime listener
+  // won't immediately re-fetch and overwrite our local state
+  markSelfPush();
 
   try {
     let userId = appState.user ? appState.user.id : null;

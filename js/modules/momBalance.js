@@ -16,7 +16,7 @@ export function openMomModal() {
   if (modal) modal.classList.add('active');
 }
 
-export function handleWithdrawMom(onRender) {
+export async function handleWithdrawMom(onRender) {
   const input = document.getElementById('momWithdrawAmount');
   const amount = Number(input?.value || 0);
   if (amount <= 0) {
@@ -32,7 +32,6 @@ export function handleWithdrawMom(onRender) {
 
   appState.momBalance = Math.max(0, appState.momBalance - amount);
   saveMomBalanceLocal();
-  pushToSupabase();
 
   const newTx = {
     id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -45,17 +44,21 @@ export function handleWithdrawMom(onRender) {
   };
   appState.transactions.unshift(newTx);
   saveTransactionsLocal();
-  pushToSupabase();
+
+  // Render UI dulu agar user langsung lihat perubahan
+  if (typeof onRender === 'function') onRender();
 
   if (input) input.value = '';
   const modal = document.getElementById('modalMomMoney');
   if (modal) modal.classList.remove('active');
 
-  if (typeof onRender === 'function') onRender();
+  // Push ke cloud SETELAH state sudah final
+  await pushToSupabase();
+
   alert(`Berhasil menarik ${formatRupiah(amount)} dari simpanan Orang Tua ke saldo aktif!`);
 }
 
-export function handleDepositMom(onRender) {
+export async function handleDepositMom(onRender) {
   const input = document.getElementById('momDepositAmount');
   const amount = Number(input?.value || 0);
   if (amount <= 0) {
@@ -65,17 +68,21 @@ export function handleDepositMom(onRender) {
 
   appState.momBalance += amount;
   saveMomBalanceLocal();
-  pushToSupabase();
+
+  // Render UI dulu agar user langsung lihat perubahan
+  if (typeof onRender === 'function') onRender();
 
   if (input) input.value = '';
   const modal = document.getElementById('modalMomMoney');
   if (modal) modal.classList.remove('active');
 
-  if (typeof onRender === 'function') onRender();
+  // Push ke cloud SETELAH state sudah final
+  await pushToSupabase();
+
   alert(`Berhasil menambah titipan ${formatRupiah(amount)} ke simpanan Orang Tua!`);
 }
 
-export function handleSetMomBalance(onRender) {
+export async function handleSetMomBalance(onRender) {
   const input = document.getElementById('momDirectAmount');
   const amount = Number(input?.value || 0);
   if (amount < 0) {
@@ -85,11 +92,15 @@ export function handleSetMomBalance(onRender) {
 
   appState.momBalance = amount;
   saveMomBalanceLocal();
-  pushToSupabase();
+
+  // Render UI dulu agar user langsung lihat perubahan
+  if (typeof onRender === 'function') onRender();
 
   const modal = document.getElementById('modalMomMoney');
   if (modal) modal.classList.remove('active');
 
-  if (typeof onRender === 'function') onRender();
+  // Push ke cloud SETELAH state sudah final
+  await pushToSupabase();
+
   alert(`Saldo Uang di Orang Tua berhasil diperbarui menjadi ${formatRupiah(amount)}!`);
 }

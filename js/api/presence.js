@@ -163,6 +163,17 @@ export function updateAdminPresenceUI() {
   });
 }
 
+let realtimeSyncTimer = null;
+let skipNextRealtimeSync = false;
+
+// Call this from pushToSupabase to prevent the realtime listener
+// from immediately re-fetching data we just pushed ourselves
+export function markSelfPush() {
+  skipNextRealtimeSync = true;
+  // Reset after 3 seconds in case the realtime event doesn't fire
+  setTimeout(() => { skipNextRealtimeSync = false; }, 3000);
+}
+
 export function subscribeToSupabaseRealtime(onSyncTrigger) {
   const supabaseClient = getSupabaseClient();
   if (!supabaseClient || !appState.user?.id) return;
@@ -178,19 +189,32 @@ export function subscribeToSupabaseRealtime(onSyncTrigger) {
       'postgres_changes',
       { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${userId}` },
       () => {
-        if (typeof onSyncTrigger === 'function') onSyncTrigger();
+        debouncedSync(onSyncTrigger);
       }
     )
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'user_settings', filter: `user_id=eq.${userId}` },
       () => {
-        if (typeof onSyncTrigger === 'function') onSyncTrigger();
+        debouncedSync(onSyncTrigger);
       }
     )
     .subscribe();
 
   initPresenceChannel();
+}
+
+function debouncedSync(onSyncTrigger) {
+  // If we just pushed data ourselves, skip this sync event
+  if (skipNextRealtimeSync) {
+    skipNextRealtimeSync = false;
+    return;
+  }
+  // Debounce: wait 2 seconds before fetching to avoid rapid re-fetches
+  if (realtimeSyncTimer) clearTimeout(realtimeSyncTimer);
+  realtimeSyncTimer = setTimeout(() => {
+    if (typeof onSyncTrigger === 'function') onSyncTrigger();
+  }, 2000);
 }
 
 export async function stopPresenceChannel() {
