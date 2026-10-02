@@ -54,6 +54,7 @@ export async function handleWithdrawMom(onRender) {
 
   // Push ke cloud SETELAH state sudah final
   await pushToSupabase();
+  if (typeof onRender === 'function') onRender();
 
   alert(`Berhasil menarik ${formatRupiah(amount)} dari simpanan Orang Tua ke saldo aktif!`);
 }
@@ -78,6 +79,7 @@ export async function handleDepositMom(onRender) {
 
   // Push ke cloud SETELAH state sudah final
   await pushToSupabase();
+  if (typeof onRender === 'function') onRender();
 
   alert(`Berhasil menambah titipan ${formatRupiah(amount)} ke simpanan Orang Tua!`);
 }
@@ -101,6 +103,7 @@ export async function handleSetMomBalance(onRender) {
 
   // Push ke cloud SETELAH state sudah final
   await pushToSupabase();
+  if (typeof onRender === 'function') onRender();
 
   alert(`Saldo Uang di Orang Tua berhasil diperbarui menjadi ${formatRupiah(amount)}!`);
 }

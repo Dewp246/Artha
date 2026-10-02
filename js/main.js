@@ -37,7 +37,8 @@ import {
   fetchFromSupabase,
   pushToSupabase,
   deleteFromSupabase,
-  subscribeToSupabaseRealtime
+  subscribeToSupabaseRealtime,
+  isSelfPushCooldownActive
 } from './api/sync.js';
 import {
   initSupabaseAuth,
@@ -539,18 +540,18 @@ function setupEventListeners() {
   document.getElementById('inputImportJSON')?.addEventListener('change', importDataJSON);
   document.getElementById('btnClearAllData')?.addEventListener('click', clearAllData);
 
-  // Auto-sync when user returns to app
+  // Auto-sync when user returns to app (only if not in cooldown window)
   window.addEventListener('focus', () => {
     const client = getSupabaseClient();
-    if (client && appState.user) {
-      fetchFromSupabase();
+    if (client && appState.user && !isSelfPushCooldownActive()) {
+      fetchFromSupabase(renderApp);
     }
   });
 
   document.addEventListener('visibilitychange', () => {
     const client = getSupabaseClient();
-    if (!document.hidden && client && appState.user) {
-      fetchFromSupabase();
+    if (!document.hidden && client && appState.user && !isSelfPushCooldownActive()) {
+      fetchFromSupabase(renderApp);
     }
   });
 }

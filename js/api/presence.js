@@ -174,6 +174,10 @@ export function markSelfPush() {
   selfPushCooldownUntil = Date.now() + 4000; // ignore events for 4 seconds
 }
 
+export function isSelfPushCooldownActive() {
+  return Date.now() < selfPushCooldownUntil;
+}
+
 export function subscribeToSupabaseRealtime(onSyncTrigger) {
   const supabaseClient = getSupabaseClient();
   if (!supabaseClient || !appState.user?.id) return;

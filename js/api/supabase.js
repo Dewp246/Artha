@@ -55,7 +55,13 @@ export function initSupabaseClient() {
 export function copyRlsSqlScript() {
   const sql = `-- 1. Pastikan kolom user_id ada dan bertipe UUID
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
-ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS user_id UUID PRIMARY KEY REFERENCES auth.users(id);
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS mom_balance NUMERIC DEFAULT 0;
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS budgets JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS savings_goals JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS debts JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS broadcast_notice JSONB;
+ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- 2. Aktifkan Row Level Security (RLS) pada tabel transactions dan user_settings
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;

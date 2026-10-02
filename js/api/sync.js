@@ -5,8 +5,8 @@
 import { getSupabaseClient, initSupabaseClient } from './supabase.js';
 import { appState, getDeletedIds, addDeletedId, resetAppStateData } from '../state.js';
 import { STORAGE_KEYS, DEFAULT_BUDGETS, cleanSupabaseUrl } from '../config.js';
-import { markSelfPush } from './presence.js';
-export { subscribeToSupabaseRealtime, markSelfPush } from './presence.js';
+import { markSelfPush, isSelfPushCooldownActive } from './presence.js';
+export { subscribeToSupabaseRealtime, markSelfPush, isSelfPushCooldownActive } from './presence.js';
 
 export async function pushTransactionsArray(txList, userId) {
   const supabaseClient = getSupabaseClient();
@@ -29,7 +29,11 @@ export async function pushTransactionsArray(txList, userId) {
   }
 }
 
-export async function fetchFromSupabase(onRender) {
+export async function fetchFromSupabase(onRender, force = false) {
+  if (!force && isSelfPushCooldownActive()) {
+    return;
+  }
+
   const supabaseClient = getSupabaseClient();
   if (!supabaseClient) return;
 
@@ -148,14 +152,13 @@ export async function fetchFromSupabase(onRender) {
       localStorage.setItem(STORAGE_KEYS.debts(userId), '[]');
 
       await supabaseClient.from('user_settings').upsert({
-        id: userId,
         user_id: userId,
         budgets: appState.budgets,
         mom_balance: 0,
         savings_goals: [],
         debts: [],
         updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      }, { onConflict: 'user_id' });
     }
 
     if (typeof onRender === 'function') onRender();
@@ -193,7 +196,10 @@ export async function pushToSupabase() {
       await pushTransactionsArray(cleanTx, userId);
     }
 
-    const settingsPayload = {
+    // Update user_settings (primary key is user_id)
+    // 1. Try full payload with onConflict: 'user_id'
+    const fullSettings = {
+      user_id: userId,
       budgets: appState.budgets,
       mom_balance: appState.momBalance,
       savings_goals: appState.savingsGoals || [],
@@ -202,22 +208,32 @@ export async function pushToSupabase() {
       updated_at: new Date().toISOString()
     };
 
-    // Strategy: try UPDATE first (record should already exist), fallback to INSERT
-    const { error: updateError, count } = await supabaseClient
+    const { error: fullError } = await supabaseClient
       .from('user_settings')
-      .update(settingsPayload)
-      .eq('user_id', userId);
+      .upsert(fullSettings, { onConflict: 'user_id' });
 
-    if (updateError) {
-      console.warn('Supabase UPDATE user_settings error:', JSON.stringify(updateError));
-
-      // Fallback: try upsert with full object
-      const { error: upsertError } = await supabaseClient
+    if (fullError) {
+      console.warn('Full user_settings upsert error, falling back to basic columns:', fullError);
+      // Fallback: table in Supabase might only have user_id, mom_balance, updated_at
+      const basicSettings = {
+        user_id: userId,
+        mom_balance: appState.momBalance,
+        updated_at: new Date().toISOString()
+      };
+      const { error: basicError } = await supabaseClient
         .from('user_settings')
-        .upsert({ id: userId, user_id: userId, ...settingsPayload }, { onConflict: 'id' });
+        .upsert(basicSettings, { onConflict: 'user_id' });
 
-      if (upsertError) {
-        console.warn('Supabase UPSERT user_settings fallback error:', JSON.stringify(upsertError));
+      if (basicError) {
+        console.warn('Basic user_settings upsert error:', basicError);
+        // Direct update as last resort
+        const { error: updateErr } = await supabaseClient
+          .from('user_settings')
+          .update({ mom_balance: appState.momBalance, updated_at: new Date().toISOString() })
+          .eq('user_id', userId);
+        if (updateErr) {
+          console.warn('Final update attempt error:', updateErr);
+        }
       }
     }
 
